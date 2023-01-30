@@ -1,2 +1,2 @@
-def pause():
+def main():
     raise Exception("pause")
