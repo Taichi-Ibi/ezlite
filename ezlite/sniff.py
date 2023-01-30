@@ -5,7 +5,7 @@ import os
 import re
 
 
-def sniff(
+def main(
     word,
     /,
     pattern,
@@ -158,7 +158,3 @@ def collect_neighbor(num_list, n_neighbors):
             collected_list.append(num + diff)
     collected_list = sorted(list(set(collected_list)))
     return collected_list
-
-
-# if __name__ == "__main__":
-# main()
