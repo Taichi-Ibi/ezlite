@@ -1,2 +1,1 @@
-def pause():
-    raise Exception("pause")
+from ezlite.pause import pause
