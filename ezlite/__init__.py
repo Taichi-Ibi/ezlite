@@ -1,2 +1,2 @@
-from ezlite.pause import *
-from ezlite.sniff import *
+from . import pause
+from . import sniff
