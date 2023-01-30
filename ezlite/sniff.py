@@ -5,17 +5,17 @@ import os
 import re
 
 
-def main(
+def sniff(
     word,
-    pattern,
     /,
+    pattern,
     environ="",
     *,
     count=True,
     decoration=True,
     fname=True,
-    n_neighbors=0,
-    result=True,
+    n_neighbors=2,
+    show_content=True,
     sep=True,
 ):
     # 環境変数でホームパスを取得
@@ -63,7 +63,7 @@ def main(
                     path += " " + str(r.get("count"))
                 small_output.append(path)
             # -rの処理 検索結果を表示
-            if result:
+            if show_content:
                 idxs = r.get("index_added")
                 for itr, idx in enumerate(idxs):
                     line = r.get("lines")[idx]
@@ -92,35 +92,6 @@ def main(
     for big in big_output:
         for small in big:
             print(small)
-
-
-def get_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-w", "--word", type=str, required=True, help="検索する文字列")
-    parser.add_argument("-p", "--ptn", type=str, required=True, help="検索対象とするファイル")
-    parser.add_argument("-e", "--env", type=str, default="", help="親ディレクトリとする環境変数")
-    parser.add_argument("-a", "--after", type=int, default=0, help="追加で下に表示する行数")
-    parser.add_argument("-b", "--before", type=int, default=0, help="追加で上に表示する行数")
-    parser.add_argument(
-        "-r", "--result", action="store_false", help="オプションをつけるとマッチした行を表示しない"
-    )
-    parser.add_argument(
-        "-i", "--index", action="store_false", help="オプションをつけるとマッチした行番号を表示しない"
-    )
-    parser.add_argument(
-        "-s", "--sep", action="store_false", help="オプションをつけるとマッチごとに行を区切らない"
-    )
-    parser.add_argument(
-        "-n", "--name", action="store_false", help="オプションをつけるとファイル名を出力しない"
-    )
-    parser.add_argument(
-        "-m", "--mark", action="store_false", help="オプションをつけるとマッチした行に*を付けない"
-    )
-    parser.add_argument(
-        "-c", "--count", action="store_false", help="オプションをつけるとマッチした行数を表示しない"
-    )
-    args = parser.parse_args()
-    return args
 
 
 def get_home_path(env):
@@ -189,5 +160,5 @@ def collect_neighbor(num_list, n_neighbors):
     return collected_list
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+# main()
