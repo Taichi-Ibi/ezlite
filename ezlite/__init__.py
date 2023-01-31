@@ -1,2 +1,2 @@
-from pause import *
-from sniff import *
+from .pause import *
+from .sniff import *
