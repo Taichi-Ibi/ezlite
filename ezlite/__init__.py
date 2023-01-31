@@ -1,3 +1,2 @@
-from . import pause
-
-# from . import sniff
+from pause import *
+from sniff import *
