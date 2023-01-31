@@ -1,7 +1,8 @@
+import argparse
 import glob
+import json
 import os
-
-from submodules.utils import *
+import re
 
 
 def main(
@@ -91,3 +92,69 @@ def main(
     for big in big_output:
         for small in big:
             print(small)
+
+
+def get_home_path(env):
+    if not os.getenv(env) is None:
+        # 環境変数を指定した場合
+        home_path = os.getenv(env)
+    else:
+        # MacとWindowsのホームパスを取得
+        default_paths = [os.getenv("HOME"), os.getenv("HOMEPATH")]
+        home_path = [hp for hp in default_paths if not hp is None][0]
+    return home_path
+
+
+def get_lines(path):
+    if path.endswith("ipynb"):
+        lines = parse_ipynb(path)
+    else:
+        lines = parse_text(path)
+    return lines
+
+
+def parse_ipynb(path):
+    with open(path) as f:
+        jsn = json.load(f)
+        # セルの情報をリストに格納
+        cells = jsn["cells"]
+        # セルからコード部分のみ取得
+        cell_codes = [c["source"] for c in cells]
+        # 1行ごとにリストに追加
+        lines = []
+        for codes in cell_codes:
+            for c in codes:
+                lines.append(c)
+        # 末尾の改行文字を削除
+        lines = [l[:-1] if l.endswith("\n") else l for l in lines]
+    return lines
+
+
+def parse_text(path):
+    with open(path, "r") as f:
+        lines = re.split("[\n|\r|\r\n]", f.read())
+    return lines
+
+
+def get_matched_idxs(lines, word):
+    """サーチする文字列が含まれるリストの番号を返す"""
+    idxs_matched = []
+    for idx, line in enumerate(lines):
+        if word in line:
+            idxs_matched.append(idx)
+        else:
+            pass
+    return idxs_matched
+
+
+def collect_neighbor(num_list, n_neighbors):
+    """リストの各数値の前後nの範囲の数値を追加して重複を除外する
+    >>> collect_neighbor([2, 10], 1, 2)
+    [1, 2, 3, 4, 9, 10, 11, 12]
+    """
+    collected_list = []
+    for num in num_list:
+        for diff in range(-n_neighbors, n_neighbors + 1):
+            collected_list.append(num + diff)
+    collected_list = sorted(list(set(collected_list)))
+    return collected_list
