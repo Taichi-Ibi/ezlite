@@ -1,7 +1,7 @@
 import glob
 import os
 
-from submodules.utils import *
+from utils.utils import *
 
 
 def main(
