@@ -160,5 +160,5 @@ def collect_neighbor(num_list, n_neighbors):
     return collected_list
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+# main()
