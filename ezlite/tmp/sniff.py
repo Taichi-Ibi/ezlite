@@ -1,7 +1,7 @@
 import glob
 import os
 
-from .utils import *
+from ..utils import *
 
 
 def main(
