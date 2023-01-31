@@ -23,7 +23,7 @@ def get_lines(path):
 
 
 def parse_ipynb(path):
-    with open(path) as f:
+    with open(path, encoding="utf-8") as f:
         jsn = json.load(f)
         # セルの情報をリストに格納
         cells = jsn["cells"]
@@ -40,7 +40,7 @@ def parse_ipynb(path):
 
 
 def parse_text(path):
-    with open(path, "r") as f:
+    with open(path, "r", encoding="utf-8") as f:
         lines = re.split("[\n|\r|\r\n]", f.read())
     return lines
 
