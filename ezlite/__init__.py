@@ -1,5 +1,6 @@
 import glob
 import os
+import pyperclip
 
 from .utils import *
 
@@ -95,3 +96,25 @@ def sniff(
     for big in big_output:
         for small in big:
             print(small)
+
+
+def todt(df_name, /, col, *, fmt="ymd", sep="-", error_handling=True, new_col=None):
+    # 変換対象のカラム
+    old_srs = f"{df_name}['{col}']"
+    if new_col is None:
+        new_srs = old_srs
+    else:
+        new_srs = f"{df_name}['{new_col}']"
+    # 日付形式
+    format = fmt.replace("y", "Y")
+    format = sep.join(["%" + s for s in list(format)])
+    # コード作成
+    code = f"{new_srs} = pd.to_datetime({old_srs}, format='{format}'"
+    # エラー対応
+    if error_handling:
+        code += ", errors='coerce')"
+    else:
+        code += ")"
+    # クリップボードにコピー
+    pyperclip.copy(code)
+    return code
