@@ -121,4 +121,6 @@ def todt(df_name, /, col, *, fmt="ymd", sep="-", error_handling=True, new_col=No
 
 
 def upgrade():
-    exec("pip install git+https://github.com/Taichi-Ibi/ezlite --upgrade")
+    code = "pip install git+https://github.com/Taichi-Ibi/ezlite --upgrade"
+    pyperclip.copy(code)
+    return code
