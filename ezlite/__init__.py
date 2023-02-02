@@ -4,7 +4,17 @@ import pyperclip
 
 from .utils import *
 
-# TODO クリップボードにコピーした時にメッセージを表示する関数
+# TODO
+# クリップボードにコピーした時にメッセージを表示する関数
+# importのテンプレート
+
+
+def impt(*modules):
+    modules = sorted(modules)
+    line = ["import " + m for m in modules]
+    code = ("\n").join(line)
+    print(code)
+    pyperclip.copy(code)
 
 
 def pause():
