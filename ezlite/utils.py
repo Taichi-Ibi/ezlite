@@ -3,6 +3,21 @@ import os
 import re
 
 
+def fix_sep(path):
+    # /と\の数を数える
+    slash_cnt = path.count("/")
+    bslash_cnt = path.count("\\")
+
+    # 多い方を区切り文字として採用する
+    if bslash_cnt == slash_cnt:
+        pass
+    elif slash_cnt > bslash_cnt:
+        sep = "/"
+    elif bslash_cnt > slash_cnt:
+        sep = "\\"
+    return sep
+
+
 def get_home_path(env):
     if not os.getenv(env) is None:
         # 環境変数を指定した場合
