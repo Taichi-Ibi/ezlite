@@ -1,5 +1,6 @@
 import json
 import os
+import pyperclip
 import re
 
 
@@ -35,6 +36,15 @@ def get_lines(path):
     else:
         lines = parse_text(path)
     return lines
+
+
+def lsplit(text):
+    # 改行文字で分割
+    li = text.split("\n")
+    # 0文字のものは除外
+    li = [l for l in li if len(l) != 0]
+    pyperclip.copy(repr(li))
+    return li
 
 
 def parse_ipynb(path):

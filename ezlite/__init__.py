@@ -4,6 +4,8 @@ import pyperclip
 
 from .utils import *
 
+# TODO クリップボードにコピーした時にメッセージを表示する関数
+
 
 def pause():
     raise Exception("pause")
