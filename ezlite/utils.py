@@ -4,6 +4,13 @@ import pyperclip
 import re
 
 
+def print_copy(code, pp):
+    print(code)
+    if pp is True:
+        pyperclip.copy(code)
+    return None
+
+
 def fix_sep(path):
     # /と\の数を数える
     slash_cnt = path.count("/")

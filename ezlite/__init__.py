@@ -1,20 +1,18 @@
 import glob
 import os
-import pyperclip
 
 from .utils import *
 
 # TODO
-# クリップボードにコピーした時にメッセージを表示する関数
 # importのテンプレート
 
 
-def impt(*modules):
+def impt(*modules, pp=True):
     modules = sorted(modules)
     line = ["import " + m for m in modules]
     code = ("\n").join(line)
-    print(code)
-    pyperclip.copy(code)
+    print_copy(code, pp)
+    return None
 
 
 def pause():
@@ -110,7 +108,7 @@ def sniff(
             print(small)
 
 
-def psplit(path):
+def psplit(path, pp=True):
     # 同じ文字を含む環境変数を抽出
     envs = {k: v for k, v in dict(os.environ).items() if v in path}
     sep_s = fix_sep(path)
@@ -132,13 +130,15 @@ def psplit(path):
         code = (join_s).join([path_front, path_back])
         code = f"os.path.join({code})"
 
-        print(code)
-        pyperclip.copy(code)
+        print_copy(code, pp)
+        return None
     else:
-        pass
+        return None
 
 
-def todt(df_name, /, col, *, fmt="ymd", sep="-", error_handling=True, new_col=None):
+def todt(
+    df_name, /, col, *, fmt="ymd", sep="-", error_handling=True, new_col=None, pp=True
+):
     # 変換対象のカラム
     old_srs = f"{df_name}['{col}']"
     if new_col is None:
@@ -155,12 +155,11 @@ def todt(df_name, /, col, *, fmt="ymd", sep="-", error_handling=True, new_col=No
         code += ", errors='coerce')"
     else:
         code += ")"
-    # クリップボードにコピー
-    pyperclip.copy(code)
-    return code
+    print_copy(code, pp)
+    return None
 
 
-def upgrade():
+def upgrade(pp=True):
     code = "pip install git+https://github.com/Taichi-Ibi/ezlite --upgrade"
-    pyperclip.copy(code)
-    return code
+    print_copy(code, pp)
+    return None
