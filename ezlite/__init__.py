@@ -6,6 +6,7 @@ from .utils import *
 # TODO
 # importのテンプレート
 # 相対パスを絶対パスにする関数
+# sniffでヒットしすぎたら停止する
 
 
 def impt(*modules, tpl=False, pp=True):
@@ -34,7 +35,7 @@ def impt(*modules, tpl=False, pp=True):
 
 
 def pause():
-    raise Exception("pause")
+    raise Exception("stop")
 
 
 def sniff(
@@ -57,6 +58,9 @@ def sniff(
 
     # サーチするパスのリストを取得
     paths = glob.glob(ptn, recursive=True)
+
+    # 検索対象のファイル数を表示
+    print(f"検索対象ファイル数: {len(paths)}")
 
     # 検索結果を辞書に追加
     result = []
@@ -81,6 +85,10 @@ def sniff(
         ]
         # 検索結果を辞書に追加
         result.append(r_dict)
+
+        if len(result) == 20:
+            print("ヒット数が20を超えたので検索を停止しました。")
+            break
 
     # 出力を作成
     big_output = []
