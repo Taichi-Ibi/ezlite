@@ -60,7 +60,7 @@ def sniff(
     paths = glob.iglob(ptn, recursive=True)
 
     # 検索対象のファイル数を表示
-    print(f"検索対象ファイル数: {len(paths)}")
+    # print(f"検索対象ファイル数: {len(paths)}")
 
     # 検索結果を辞書に追加
     result = []
