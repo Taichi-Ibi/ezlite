@@ -8,12 +8,26 @@ from .utils import *
 # 相対パスを絶対パスにする関数
 
 
-def impt(*modules, pp=True, tpl=False):
-    if tpl is False:
-        modules = sorted(modules)
+def impt(*modules, tpl=False, pp=True):
+    if tpl is True:
+        modules = [
+            "glob",
+            "os",
+            "from datetime import datetime",
+            "",
+            "numpy as np",
+            "pandas as pd",
+        ]
     else:
-        modules = ["os", "", "numpy as np", "pandas as pd"]
-    line = ["import " + m if m != "" else "" for m in modules]
+        modules = sorted(modules)
+    line = []
+    for m in modules:
+        if m.startswith("from "):
+            line.append(m)
+        elif m != "":
+            line.append(f"import {m}")
+        else:
+            line.append("")
     code = ("\n").join(line)
     print_copy(code, pp)
     return None
@@ -112,7 +126,7 @@ def sniff(
             print(small)
 
 
-def psplit(path, pp=True):
+def psplit(path, *, pp=True):
 
     path = ref2abs(path)
 
@@ -144,7 +158,7 @@ def psplit(path, pp=True):
 
 
 def todt(
-    df_name, /, col, *, fmt="ymd", sep="-", error_handling=True, new_col=None, pp=True
+    df_name, /, col, *, fmt="ymd", sep="-", new_col=None, error_handling=True, pp=True
 ):
     # 変換対象のカラム
     old_srs = f"{df_name}['{col}']"
@@ -166,7 +180,7 @@ def todt(
     return None
 
 
-def upgrade(pp=True):
+def upgrade(*, pp=True):
     code = "pip install git+https://github.com/Taichi-Ibi/ezlite --upgrade"
     print_copy(code, pp)
     return None

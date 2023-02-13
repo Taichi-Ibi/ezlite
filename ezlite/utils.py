@@ -24,9 +24,7 @@ def fix_sep(path):
     bslash_cnt = path.count("\\")
 
     # 多い方を区切り文字として採用する
-    if bslash_cnt == slash_cnt:
-        pass
-    elif slash_cnt > bslash_cnt:
+    if slash_cnt > bslash_cnt:
         sep = "/"
     elif bslash_cnt > slash_cnt:
         sep = "\\"
