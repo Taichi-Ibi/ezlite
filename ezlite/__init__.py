@@ -8,9 +8,12 @@ from .utils import *
 # 相対パスを絶対パスにする関数
 
 
-def impt(*modules, pp=True):
-    modules = sorted(modules)
-    line = ["import " + m for m in modules]
+def impt(*modules, pp=True, tpl=False):
+    if tpl is False:
+        modules = sorted(modules)
+    else:
+        modules = ["os", "", "numpy as np", "pandas as pd"]
+    line = ["import " + m if m != "" else "" for m in modules]
     code = ("\n").join(line)
     print_copy(code, pp)
     return None
