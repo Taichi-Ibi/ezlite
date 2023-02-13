@@ -5,6 +5,7 @@ from .utils import *
 
 # TODO
 # importのテンプレート
+# 相対パスを絶対パスにする関数
 
 
 def impt(*modules, pp=True):
@@ -109,6 +110,9 @@ def sniff(
 
 
 def psplit(path, pp=True):
+
+    path = ref2abs(path)
+
     # 同じ文字を含む環境変数を抽出
     envs = {k: v for k, v in dict(os.environ).items() if v in path}
     sep_s = fix_sep(path)

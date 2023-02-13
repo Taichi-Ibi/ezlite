@@ -1,7 +1,13 @@
 import json
 import os
+import pathlib
 import pyperclip
 import re
+
+
+def ref2abs(path):
+    p = pathlib.Path(path)
+    return p.resolve()
 
 
 def print_copy(code, pp):
