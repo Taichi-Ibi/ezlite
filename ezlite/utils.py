@@ -7,7 +7,8 @@ import re
 
 def ref2abs(path):
     p = pathlib.Path(path)
-    return p.resolve()
+    p = str(p.resolve())
+    return p
 
 
 def print_copy(code, pp):
