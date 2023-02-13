@@ -57,7 +57,7 @@ def sniff(
     ptn = os.path.join(home_path, pattern)
 
     # サーチするパスのリストを取得
-    paths = glob.glob(ptn, recursive=True)
+    paths = glob.iglob(ptn, recursive=True)
 
     # 検索対象のファイル数を表示
     print(f"検索対象ファイル数: {len(paths)}")
