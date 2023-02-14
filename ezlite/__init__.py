@@ -13,6 +13,7 @@ def ready(*modules, tpl=False, pp=True):
             "glob",
             "os",
             "from datetime import datetime",
+            "from dateutil import relativedelta",
             "",
             "numpy as np",
             "pandas as pd",
@@ -32,8 +33,8 @@ def ready(*modules, tpl=False, pp=True):
     return None
 
 
-def pause():
-    raise Exception("stop")
+def p():
+    raise Exception("pause")
 
 
 def sniff(
