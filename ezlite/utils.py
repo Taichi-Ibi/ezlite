@@ -6,15 +6,18 @@ import re
 
 
 def ref2abs(path):
-    p = pathlib.Path(path)
-    p = str(p.resolve())
-    return p
+    path = pathlib.Path(path)
+    abs_path = str(path.resolve())
+    return abs_path
 
 
 def print_copy(code, pp):
     print(code)
     if pp is True:
-        pyperclip.copy(code)
+        try:
+            pyperclip.copy(code)
+        except:
+            pass
     return None
 
 
