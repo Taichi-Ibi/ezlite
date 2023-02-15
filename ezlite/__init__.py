@@ -90,7 +90,8 @@ def sniff(
                 result.append(r_dict)
 
                 if len(result) == limit:
-                    print(f"ヒット数が{limit}を超えたので検索を中断しました。")
+                    if limit == 20:
+                        print(f"ヒット数が{limit}を超えたので検索を中断しました。")
                     break
 
     # 出力を作成
