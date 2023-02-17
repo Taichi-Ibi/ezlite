@@ -59,8 +59,10 @@ def sniff(
     ptn = os.path.join(upper_dir, pattern)
     # パスのブラケットをglob用にescapeする
     ptn = escape_brackets(ptn)
-    # サーチするパスのリストを取得
+    # サーチするパスのリストをイテレータで取得
     paths = glob.iglob(ptn, recursive=True)
+    # 検索対象が一定値以上の場合に警告を表示
+    check_itr(paths, 1000)
 
     # 検索結果を辞書に追加
     result = []

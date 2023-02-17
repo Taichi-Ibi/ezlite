@@ -6,6 +6,14 @@ import pyperclip
 import re
 
 
+def check_itr(itr, limit):
+    for tpl in enumerate(itr):
+        if tpl[0] == limit:
+            print(f"検索対象ファイル数が{limit}を超えています。")
+            break
+    return None
+
+
 def escape_brackets(path):
     # globは[]を正規表現パターンとして認識してしまうためエスケープする
     replace_list = [["[", "[[[", "[[]"], ["]", "]]]", "[]]"]]
