@@ -5,9 +5,22 @@ from itertools import tee
 from .utils import *
 
 # TODO
-# ファイルが空の時の処理
+# templateはよく使うやつ全部書いとく
+# typehint
+# docstring
 
 
+def p():
+    raise Exception("pause")
+
+
+def upgrade(*, pp=True):
+    code = "pip install git+https://github.com/Taichi-Ibi/ezlite --upgrade"
+    print_copy(code, pp)
+    return None
+
+
+# TODO
 def ready(*modules, template=False, pp=True):
     if template is True:
         modules = [
@@ -34,8 +47,66 @@ def ready(*modules, template=False, pp=True):
     return None
 
 
-def p():
-    raise Exception("pause")
+def todt(
+    df_name, /, col, *, fmt="ymd", sep="-", new_col=None, error_handling=True, pp=True
+):
+    # 変換対象のカラム
+    old_srs = f"{df_name}['{col}']"
+    if new_col is None:
+        new_srs = old_srs
+    else:
+        new_srs = f"{df_name}['{new_col}']"
+    # 日付形式
+    format = fmt.replace("y", "Y")
+    format = sep.join(["%" + s for s in list(format)])
+    # コード作成
+    code = f"{new_srs} = pd.to_datetime({old_srs}, format='{format}'"
+    # エラー対応
+    if error_handling:
+        code += ", errors='coerce')"
+    else:
+        code += ")"
+    print_copy(code, pp)
+    return None
+
+
+def psplit(path, *, multiline=False, pp=True):
+
+    # 絶対パスに変更
+    path = ref2abs(path)
+
+    # 同じ文字を含む環境変数を抽出
+    envs = {k: v for k, v in dict(os.environ).items() if v in path}
+    sep_s = fix_sep(path)
+    if len(envs):
+        # パスの文字数が最も多い環境変数を取得
+        envs_sorted = dict(sorted(envs.items(), key=lambda x: -len(x[1])))
+        env = next(iter(envs_sorted))
+
+        # 整形のための文字を定義
+        left_sep, right_sep = "", ""
+        if multiline is True:
+            left_sep = "\n    "
+        else:
+            right_sep = " "
+
+        # 環境変数
+        path_front = f"{left_sep}os.getenv('{env}')"
+
+        # 環境変数以降のパスの整形
+        join_s = f",{right_sep}"
+        path_back = path.replace(os.getenv(env), "").strip(sep_s).split(sep_s)
+        path_back = [f"{left_sep}'{p}'" for p in path_back]
+        path_back = (join_s).join(path_back)
+
+        # 環境変数部分とそれ以降を結合
+        code = (join_s).join([path_front, path_back])
+        code = f"os.path.join({code}{left_sep})"
+
+        print_copy(code, pp)
+        return None
+    else:
+        return None
 
 
 def sniff(
@@ -47,11 +118,10 @@ def sniff(
     limit=20,
     n_neighbors=2,
     count=True,
-    decoration=True,
+    decoration=False,
     sep=True,
     show_content=True,
     show_filename=True,
-    debug=False,
 ):
     # 環境変数で親ディレクトリを取得
     upper_dir = get_upper_dir(environ)
@@ -67,8 +137,6 @@ def sniff(
     paths, _paths = tee(paths)
     # 検索対象が一定値以上の場合に警告を表示
     check_itr(_paths, 1000)
-    if debug is True:
-        print(ptn)
 
     # 検索結果を辞書に追加
     result = []
@@ -145,104 +213,3 @@ def sniff(
     for big in big_output:
         for small in big:
             print(small)
-
-
-# def psplit(path, *, pp=True):
-
-#     path = ref2abs(path)
-
-#     # 同じ文字を含む環境変数を抽出
-#     envs = {k: v for k, v in dict(os.environ).items() if v in path}
-#     sep_s = fix_sep(path)
-#     if len(envs):
-#         # パスの文字数が最も多い環境変数を取得
-#         envs_sorted = dict(sorted(envs.items(), key=lambda x: -len(x[1])))
-#         env = next(iter(envs_sorted))
-
-#         # 環境変数
-#         path_front = f"\n    os.getenv('{env}')"
-
-#         # 環境変数以降のパスの整形
-#         join_s = ",\n"
-#         path_back = path.replace(os.getenv(env), "").strip(sep_s).split(sep_s)
-#         path_back = [f"    '{p}'" for p in path_back]
-#         path_back = (join_s).join(path_back)
-
-#         # 環境変数部分とそれ以降を結合
-#         code = (join_s).join([path_front, path_back])
-#         code = f"os.path.join({code}\n    )"
-
-#         print_copy(code, pp)
-#         return None
-#     else:
-#         return None
-
-
-def psplit(path, *, multiline=False, pp=True):
-
-    # 絶対パスに変更
-    path = ref2abs(path)
-    # パスの文字数を取得
-    path_len = len(path)
-
-    # 同じ文字を含む環境変数を抽出
-    envs = {k: v for k, v in dict(os.environ).items() if v in path}
-    sep_s = fix_sep(path)
-    if len(envs):
-        # パスの文字数が最も多い環境変数を取得
-        envs_sorted = dict(sorted(envs.items(), key=lambda x: -len(x[1])))
-        env = next(iter(envs_sorted))
-
-        # 整形のための文字を定義
-        left_sep, right_sep = "", ""
-        if multiline is True:
-            left_sep = "\n    "
-        else:
-            right_sep = " "
-
-        # 環境変数
-        path_front = f"{left_sep}os.getenv('{env}')"
-
-        # 環境変数以降のパスの整形
-        join_s = f",{right_sep}"
-        path_back = path.replace(os.getenv(env), "").strip(sep_s).split(sep_s)
-        path_back = [f"{left_sep}'{p}'" for p in path_back]
-        path_back = (join_s).join(path_back)
-
-        # 環境変数部分とそれ以降を結合
-        code = (join_s).join([path_front, path_back])
-        code = f"os.path.join({code}{left_sep})"
-
-        print_copy(code, pp)
-        return None
-    else:
-        return None
-
-
-def todt(
-    df_name, /, col, *, fmt="ymd", sep="-", new_col=None, error_handling=True, pp=True
-):
-    # 変換対象のカラム
-    old_srs = f"{df_name}['{col}']"
-    if new_col is None:
-        new_srs = old_srs
-    else:
-        new_srs = f"{df_name}['{new_col}']"
-    # 日付形式
-    format = fmt.replace("y", "Y")
-    format = sep.join(["%" + s for s in list(format)])
-    # コード作成
-    code = f"{new_srs} = pd.to_datetime({old_srs}, format='{format}'"
-    # エラー対応
-    if error_handling:
-        code += ", errors='coerce')"
-    else:
-        code += ")"
-    print_copy(code, pp)
-    return None
-
-
-def upgrade(*, pp=True):
-    code = "pip install git+https://github.com/Taichi-Ibi/ezlite --upgrade"
-    print_copy(code, pp)
-    return None
