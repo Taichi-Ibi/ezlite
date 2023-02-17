@@ -1,5 +1,6 @@
 import glob
 import os
+from itertools import tee
 
 from .utils import *
 
@@ -62,8 +63,9 @@ def sniff(
     ptn = escape_brackets(ptn)
     # サーチするパスのリストをイテレータで取得
     paths = glob.iglob(ptn, recursive=True)
+    # イテレータをコピー
+    paths, _paths = tee(paths)
     # 検索対象が一定値以上の場合に警告を表示
-    _paths = paths
     check_itr(_paths, 1000)
     if debug is True:
         print(ptn)
