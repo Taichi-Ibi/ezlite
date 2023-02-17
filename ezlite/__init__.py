@@ -60,6 +60,8 @@ def sniff(
     ptn = os.path.join(upper_dir, pattern)
     if debug is True:
         print(ptn)
+    # パスのブラケットをglob用にescapeする
+    ptn = escape_brackets(ptn)
     # サーチするパスのリストを取得
     paths = glob.iglob(ptn, recursive=True)
 

@@ -6,6 +6,16 @@ import pyperclip
 import re
 
 
+def escape_brackets(path):
+    # globは[]を正規表現パターンとして認識してしまうためエスケープする
+    replace_list = [["[", "[[[", "[[]"], ["]", "]]]", "[]]"]]
+    path = path.replace(replace_list[0][0], replace_list[0][1])
+    path = path.replace(replace_list[1][0], replace_list[1][1])
+    path = path.replace(replace_list[0][1], replace_list[0][2])
+    path = path.replace(replace_list[1][1], replace_list[1][2])
+    return path
+
+
 def ref2abs(path):
     path = pathlib.Path(path)
     abs_path = str(path.resolve())
