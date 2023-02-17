@@ -147,9 +147,43 @@ def sniff(
             print(small)
 
 
+# def psplit(path, *, pp=True):
+
+#     path = ref2abs(path)
+
+#     # 同じ文字を含む環境変数を抽出
+#     envs = {k: v for k, v in dict(os.environ).items() if v in path}
+#     sep_s = fix_sep(path)
+#     if len(envs):
+#         # パスの文字数が最も多い環境変数を取得
+#         envs_sorted = dict(sorted(envs.items(), key=lambda x: -len(x[1])))
+#         env = next(iter(envs_sorted))
+
+#         # 環境変数
+#         path_front = f"\n    os.getenv('{env}')"
+
+#         # 環境変数以降のパスの整形
+#         join_s = ",\n"
+#         path_back = path.replace(os.getenv(env), "").strip(sep_s).split(sep_s)
+#         path_back = [f"    '{p}'" for p in path_back]
+#         path_back = (join_s).join(path_back)
+
+#         # 環境変数部分とそれ以降を結合
+#         code = (join_s).join([path_front, path_back])
+#         code = f"os.path.join({code}\n    )"
+
+#         print_copy(code, pp)
+#         return None
+#     else:
+#         return None
+
+
 def psplit(path, *, pp=True):
 
+    # 絶対パスに変更
     path = ref2abs(path)
+    # パスの文字数を取得
+    path_len = len(path)
 
     # 同じ文字を含む環境変数を抽出
     envs = {k: v for k, v in dict(os.environ).items() if v in path}
@@ -159,18 +193,25 @@ def psplit(path, *, pp=True):
         envs_sorted = dict(sorted(envs.items(), key=lambda x: -len(x[1])))
         env = next(iter(envs_sorted))
 
+        # 整形のための文字を定義
+        if path_len >= 100:
+            indent = " " * 4
+            newline = "\n"
+        else:
+            indent, newline = "", ""
+
         # 環境変数
-        path_front = f"os.getenv('{env}')"
+        path_front = f"{indent}os.getenv('{env}')"
 
         # 環境変数以降のパスの整形
-        join_s = ", "
+        join_s = f", {newline}"
         path_back = path.replace(os.getenv(env), "").strip(sep_s).split(sep_s)
-        path_back = [f"'{p}'" for p in path_back]
+        path_back = [f"{indent}'{p}'" for p in path_back]
         path_back = (join_s).join(path_back)
 
         # 環境変数部分とそれ以降を結合
         code = (join_s).join([path_front, path_back])
-        code = f"os.path.join({code})"
+        code = f"os.path.join({newline}{code}{newline}{indent})"
 
         print_copy(code, pp)
         return None
