@@ -1,6 +1,7 @@
 import json
 import os
 import pathlib
+import platform
 import pyperclip
 import re
 
@@ -34,15 +35,20 @@ def fix_sep(path):
     return sep
 
 
-def get_home_path(env):
-    if not os.getenv(env) is None:
-        # 環境変数を指定した場合
-        home_path = os.getenv(env)
+def get_upper_dir(environ):
+    if environ is None:
+        # 引数なしの場合
+        if platform.system() == "Windows":
+            # Windowsの場合
+            environ = "HOMEPATH"
+        else:
+            # MacやLinuxの場合
+            environ = "HOME"
     else:
-        # MacとWindowsのホームパスを取得
-        default_paths = [os.getenv("HOME"), os.getenv("HOMEPATH")]
-        home_path = [hp for hp in default_paths if not hp is None][0]
-    return home_path
+        # 引数ありの場合はそのまま使う
+        pass
+    upper_dir = os.getenv(environ)
+    return upper_dir
 
 
 def get_lines(path):

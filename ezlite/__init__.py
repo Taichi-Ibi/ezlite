@@ -7,8 +7,8 @@ from .utils import *
 # ファイルが空の時の処理
 
 
-def ready(*modules, tpl=False, pp=True):
-    if tpl is True:
+def ready(*modules, template=False, pp=True):
+    if template is True:
         modules = [
             "glob",
             "os",
@@ -41,22 +41,25 @@ def sniff(
     word,
     /,
     pattern,
-    environ="",
     *,
+    environ=None,
     limit=20,
+    n_neighbors=2,
     count=True,
     decoration=True,
-    fname=True,
-    n_neighbors=2,
-    show_content=True,
     sep=True,
+    show_content=True,
+    show_filename=True,
+    debug=False,
 ):
-    # 環境変数でホームパスを取得
-    home_path = get_home_path(environ)
-    # 絶対パスの場合、前半をホームパスに書き換え
-    pattern = pattern.replace(home_path + "/", "")
+    # 環境変数で親ディレクトリを取得
+    upper_dir = get_upper_dir(environ)
+    # 絶対パスの場合はuppper_dirが重複するので空白に置き換え
+    pattern = pattern.replace(upper_dir + "/", "")
     # 親ディレクトリとパターンを結合
-    ptn = os.path.join(home_path, pattern)
+    ptn = os.path.join(upper_dir, pattern)
+    if debug is True:
+        print(ptn)
     # サーチするパスのリストを取得
     paths = glob.iglob(ptn, recursive=True)
 
@@ -99,7 +102,7 @@ def sniff(
     for r in result:
         small_output = []
         # -nの処理 ファイル名を表示
-        if fname:
+        if show_filename:
             path = "- " + r.get("path")
             # -cの処理 マッチ数を表示
             if count:
