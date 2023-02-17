@@ -50,7 +50,6 @@ def sniff(
     sep=True,
     show_content=True,
     show_filename=True,
-    debug=False,
 ):
     # 環境変数で親ディレクトリを取得
     upper_dir = get_upper_dir(environ)
@@ -58,8 +57,6 @@ def sniff(
     pattern = pattern.replace(upper_dir + "/", "")
     # 親ディレクトリとパターンを結合
     ptn = os.path.join(upper_dir, pattern)
-    if debug is True:
-        print(ptn)
     # パスのブラケットをglob用にescapeする
     ptn = escape_brackets(ptn)
     # サーチするパスのリストを取得
@@ -94,7 +91,7 @@ def sniff(
                 # 検索結果を辞書に追加
                 result.append(r_dict)
 
-                if len(result) == limit:
+                if (limit is not None) & (len(result) == limit):
                     if limit == 20:
                         print(f"ヒット数が{limit}を超えたので検索を中断しました。")
                     break

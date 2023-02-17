@@ -17,6 +17,7 @@ def escape_brackets(path):
 
 
 def ref2abs(path):
+    # 相対パスを絶対パスに変換する
     path = pathlib.Path(path)
     abs_path = str(path.resolve())
     return abs_path
@@ -80,24 +81,30 @@ def lsplit(text):
 
 def parse_ipynb(path):
     with open(path, encoding="utf-8") as f:
-        jsn = json.load(f)
-        # セルの情報をリストに格納
-        cells = jsn["cells"]
-        # セルからコード部分のみ取得
-        cell_codes = [c["source"] for c in cells]
-        # 1行ごとにリストに追加
-        lines = []
-        for codes in cell_codes:
-            for c in codes:
-                lines.append(c)
-        # 末尾の改行文字を削除
-        lines = [l[:-1] if l.endswith("\n") else l for l in lines]
+        try:
+            jsn = json.load(f)
+            # セルの情報をリストに格納
+            cells = jsn["cells"]
+            # セルからコード部分のみ取得
+            cell_codes = [c["source"] for c in cells]
+            # 1行ごとにリストに追加
+            lines = []
+            for codes in cell_codes:
+                for c in codes:
+                    lines.append(c)
+            # 末尾の改行文字を削除
+            lines = [l[:-1] if l.endswith("\n") else l for l in lines]
+        except:
+            return None
     return lines
 
 
 def parse_text(path):
     with open(path, "r", encoding="utf-8") as f:
-        lines = re.split("[\n|\r|\r\n]", f.read())
+        try:
+            lines = re.split("[\n|\r|\r\n]", f.read())
+        except:
+            return []
     return lines
 
 
