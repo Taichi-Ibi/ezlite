@@ -63,7 +63,7 @@ def sniff(
     # サーチするパスのリストをイテレータで取得
     paths = glob.iglob(ptn, recursive=True)
     # 検索対象が一定値以上の場合に警告を表示
-    check_itr(paths, 1000)
+    # check_itr(paths, 1000)
     if debug is True:
         print(ptn)
 
