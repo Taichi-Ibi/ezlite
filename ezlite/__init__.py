@@ -50,6 +50,7 @@ def sniff(
     sep=True,
     show_content=True,
     show_filename=True,
+    debug=False,
 ):
     # 環境変数で親ディレクトリを取得
     upper_dir = get_upper_dir(environ)
@@ -63,6 +64,8 @@ def sniff(
     paths = glob.iglob(ptn, recursive=True)
     # 検索対象が一定値以上の場合に警告を表示
     check_itr(paths, 1000)
+    if debug is True:
+        print(ptn)
 
     # 検索結果を辞書に追加
     result = []
