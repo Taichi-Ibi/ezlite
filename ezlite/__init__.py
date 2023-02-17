@@ -178,7 +178,7 @@ def sniff(
 #         return None
 
 
-def psplit(path, *, pp=True):
+def psplit(path, *, multiline=False, pp=True):
 
     # 絶対パスに変更
     path = ref2abs(path)
@@ -194,24 +194,24 @@ def psplit(path, *, pp=True):
         env = next(iter(envs_sorted))
 
         # 整形のための文字を定義
-        if path_len >= 100:
-            indent = " " * 4
-            newline = "\n"
+        left_sep, right_sep = "", ""
+        if multiline is True:
+            left_sep = "\n    "
         else:
-            indent, newline = "", ""
+            right_sep = " "
 
         # 環境変数
-        path_front = f"{indent}os.getenv('{env}')"
+        path_front = f"{left_sep}os.getenv('{env}')"
 
         # 環境変数以降のパスの整形
-        join_s = f", {newline}"
+        join_s = f",{right_sep}"
         path_back = path.replace(os.getenv(env), "").strip(sep_s).split(sep_s)
-        path_back = [f"{indent}'{p}'" for p in path_back]
+        path_back = [f"{left_sep}'{p}'" for p in path_back]
         path_back = (join_s).join(path_back)
 
         # 環境変数部分とそれ以降を結合
         code = (join_s).join([path_front, path_back])
-        code = f"os.path.join({newline}{code}{newline}{indent})"
+        code = f"os.path.join({code}{left_sep})"
 
         print_copy(code, pp)
         return None
