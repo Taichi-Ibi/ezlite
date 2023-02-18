@@ -130,32 +130,35 @@ def sniff(
     # 検索結果を辞書に追加
     result_li = []
     for path in paths:
+        # 行ごとにリスト化
         lines = get_lines(path)
-        result_di = {
-            "path": path,
-            "lines": lines,
-            "index": None,
-            "count": None,
-            "index_added": None,
-            "max_digits": None,
-        }
         # マッチしたindexを取得
-        result_di["index"] = get_matched_idxs(lines, word=word)
-        result_di["count"] = len(result_di["index"])
-        # 前後の行を取得する
-        result_di["index_added"] = collect_neighbor(
-            result_di["index"], n_neighbors=n_neighbors
-        )
-        if result_di["index"]:
-            # 最大桁数を取得
-            result_di["max_digits"] = len(str(max(result_di["index_added"])))
+        indexs = get_matched_idxs(lines, word=word)
+        if indexs == []:
+            # マッチした行がない場合はpass
+            pass
+        else:
+            # マッチした行数を取得
+            count = len(indexs)
+            # n_neighborsの数だけ前後の行を取得する
+            _indexs = collect_neighbor(indexs, n_neighbors=n_neighbors)
+            # マッチした行の最大桁数を取得
+            max_digits = len(str(max(_indexs)))
             # ファイルの行数からはみ出たものは除外
-            result_di["index_added"] = [
-                i for i in result_di["index_added"] if i in range(0, len(lines))
-            ]
+            _indexs = [i for i in _indexs if i in range(0, len(lines))]
+            # dictに格納
+            result_di = {
+                "path": path,
+                "lines": lines,
+                "indexs": indexs,
+                "count": count,
+                "index_added": _indexs,
+                "max_digits": max_digits,
+            }
             # 検索結果を辞書に追加
             result_li.append(result_di)
 
+            # ヒット数にlimitを設定
             if (limit is not None) & (len(result_li) == limit):
                 if limit == 20:
                     print(f"ヒット数が{limit}を超えたので検索を中断しました。")
@@ -183,7 +186,7 @@ def sniff(
                 # -mの処理 マッチした行をハイライト
                 if not decoration is True:
                     pass
-                elif (decoration is True) & (idx in r.get("index")):
+                elif (decoration is True) & (idx in r.get("indexs")):
                     line = "* " + line
                 else:
                     line = "  " + line
@@ -199,6 +202,4 @@ def sniff(
         big_output.append(small_output)
 
     # 出力
-    for big in big_output:
-        for small in big:
-            print(small)
+    print_2dlist(big_li=big_output)

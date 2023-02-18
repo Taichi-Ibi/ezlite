@@ -24,6 +24,13 @@ import seaborn as sns
 """
 
 
+def print_2dlist(big_li):
+    for lines in big_li:
+        for line in lines:
+            print(line)
+    return None
+
+
 def check_itr(itr, file_count):
     for tpl in enumerate(itr):
         if tpl[0] == file_count:
