@@ -117,24 +117,28 @@ def sniff(
     # 絶対パスの場合はuppper_dirが重複するので空白に置き換え
     pattern = pattern.replace(upper_dir + "/", "")
     # 親ディレクトリとパターンを結合
-    ptn = os.path.join(upper_dir, pattern)
+    _pattern = os.path.join(upper_dir, pattern)
     # パスのブラケットをglob用にescapeする
-    ptn = escape_brackets(ptn)
+    _pattern = escape_brackets(_pattern)
     # サーチするパスのリストをイテレータで取得
-    paths = glob.iglob(ptn, recursive=True)
+    paths = glob.iglob(_pattern, recursive=True)
     # イテレータをコピー
     paths, _paths = tee(paths)
     # 検索対象が一定値以上の場合に警告を表示
     check_itr(_paths, file_count=1000)
 
     # 検索結果を辞書に追加
-    result = []
+    result_li = []
     for path in paths:
-        # ファイルのサイズをチェックする
         lines = get_lines(path)
-        result_di = {}
-        result_di["path"] = path
-        result_di["lines"] = lines
+        result_di = {
+            "path": path,
+            "lines": lines,
+            "index": None,
+            "count": None,
+            "index_added": None,
+            "max_digits": None,
+        }
         # マッチしたindexを取得
         result_di["index"] = get_matched_idxs(lines, word=word)
         result_di["count"] = len(result_di["index"])
@@ -150,16 +154,16 @@ def sniff(
                 i for i in result_di["index_added"] if i in range(0, len(lines))
             ]
             # 検索結果を辞書に追加
-            result.append(result_di)
+            result_li.append(result_di)
 
-            if (limit is not None) & (len(result) == limit):
+            if (limit is not None) & (len(result_li) == limit):
                 if limit == 20:
                     print(f"ヒット数が{limit}を超えたので検索を中断しました。")
                 break
 
     # 出力を作成
     big_output = []
-    for r in result:
+    for r in result_li:
         small_output = []
         # -nの処理 ファイル名を表示
         if show_filename is True:
