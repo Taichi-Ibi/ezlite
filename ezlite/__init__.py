@@ -21,12 +21,16 @@ def p():
     raise Exception("pause")
 
 
-def lsplit(text, pp=True):
+def lsplit(text, *, multiline=False, pp=True):
     # 改行文字で分割
-    li = text.split("\n")
+    li = text.strip().split("\n")
     # 0文字のものは除外
     li = [l for l in li if len(l) != 0]
-    print_copy(repr(li), pp=pp)
+    # リストを文字列に変換
+    code = repr(li)
+    # コードを整形
+    code = shape_code(code, multiline)
+    print_copy(code, pp=pp)
     return None
 
 
@@ -134,6 +138,7 @@ def sniff(
         lines = get_lines(path)
         # マッチしたindexを取得
         indexs = get_matched_idxs(lines, word=word)
+
         if indexs == []:
             # マッチした行がない場合はpass
             pass
@@ -146,6 +151,7 @@ def sniff(
             max_digits = len(str(max(_indexs)))
             # ファイルの行数からはみ出たものは除外
             _indexs = [i for i in _indexs if i in range(0, len(lines))]
+
             # dictに格納
             result_di = {
                 "path": path,
@@ -155,7 +161,7 @@ def sniff(
                 "index_added": _indexs,
                 "max_digits": max_digits,
             }
-            # 検索結果を辞書に追加
+            # 検索結果をリストに追加
             result_li.append(result_di)
 
             # ヒット数にlimitを設定

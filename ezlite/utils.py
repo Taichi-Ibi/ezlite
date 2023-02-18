@@ -24,6 +24,18 @@ import seaborn as sns
 """
 
 
+def shape_code(code, multiline):
+    if multiline is True:
+        # カンマの後ろにはスペースが1つ入っているので注意
+        sep = "\n" + " " * 4
+        code = code.replace("[", f"[{sep}")
+        code = code.replace(", ", ",").replace(",", f",{sep}")
+        code = code.replace("]", f"{sep}]")
+    else:
+        pass
+    return code
+
+
 def print_2dlist(big_li):
     for lines in big_li:
         for line in lines:
