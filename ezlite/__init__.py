@@ -106,6 +106,12 @@ def sniff(
     show_content=True,
     show_filename=True,
 ):
+    """処理の流れ
+    検索パターン作成
+    検索ファイル取得
+    ファイル検索・インデックス取得
+    出力
+    """
     # 環境変数で親ディレクトリを取得
     upper_dir = get_upper_dir(environ)
     # 絶対パスの場合はuppper_dirが重複するので空白に置き換え
@@ -125,35 +131,31 @@ def sniff(
     result = []
     for path in paths:
         # ファイルのサイズをチェックする
-        fsize = os.path.getsize(path)
-        if fsize == 0:
-            pass
-        else:
-            lines = get_lines(path)
-            r_dict = {}
-            r_dict["path"] = path
-            r_dict["lines"] = lines
-            # マッチしたindexを取得
-            r_dict["index"] = get_matched_idxs(lines, word=word)
-            r_dict["count"] = len(r_dict["index"])
-            # 前後の行を取得する
-            r_dict["index_added"] = collect_neighbor(
-                r_dict["index"], n_neighbors=n_neighbors
-            )
-            if r_dict["index"]:
-                # 最大桁数を取得
-                r_dict["max_digits"] = len(str(max(r_dict["index_added"])))
-                # ファイルの行数からはみ出たものは除外
-                r_dict["index_added"] = [
-                    i for i in r_dict["index_added"] if i in range(0, len(lines))
-                ]
-                # 検索結果を辞書に追加
-                result.append(r_dict)
+        lines = get_lines(path)
+        result_di = {}
+        result_di["path"] = path
+        result_di["lines"] = lines
+        # マッチしたindexを取得
+        result_di["index"] = get_matched_idxs(lines, word=word)
+        result_di["count"] = len(result_di["index"])
+        # 前後の行を取得する
+        result_di["index_added"] = collect_neighbor(
+            result_di["index"], n_neighbors=n_neighbors
+        )
+        if result_di["index"]:
+            # 最大桁数を取得
+            result_di["max_digits"] = len(str(max(result_di["index_added"])))
+            # ファイルの行数からはみ出たものは除外
+            result_di["index_added"] = [
+                i for i in result_di["index_added"] if i in range(0, len(lines))
+            ]
+            # 検索結果を辞書に追加
+            result.append(result_di)
 
-                if (limit is not None) & (len(result) == limit):
-                    if limit == 20:
-                        print(f"ヒット数が{limit}を超えたので検索を中断しました。")
-                    break
+            if (limit is not None) & (len(result) == limit):
+                if limit == 20:
+                    print(f"ヒット数が{limit}を超えたので検索を中断しました。")
+                break
 
     # 出力を作成
     big_output = []
