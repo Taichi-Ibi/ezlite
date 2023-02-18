@@ -5,11 +5,29 @@ import platform
 import pyperclip
 import re
 
+INSTALL_CMD = "pip install git+https://github.com/Taichi-Ibi/ezlite --upgrade"
 
-def check_itr(itr, limit):
+
+TEMPLATE = """
+import glob
+import os
+from datetime import datetime
+from dateutil import relativedelta
+from pprint import pprint
+
+import numpy as np
+import pandas as pd
+
+import japanize_matplotlib
+import matplotlib.pyplot as plt
+import seaborn as sns
+"""
+
+
+def check_itr(itr, file_count):
     for tpl in enumerate(itr):
-        if tpl[0] == limit:
-            print(f"検索対象ファイル数が{limit}を超えています。")
+        if tpl[0] == file_count:
+            print(f"検索対象ファイル数が{file_count}を超えています。\n")
             break
     return None
 
@@ -31,7 +49,8 @@ def ref2abs(path):
     return abs_path
 
 
-def print_copy(code, pp):
+def print_copy(code, *, pp=True):
+    code = code.strip()
     print(code)
     if pp is True:
         try:
@@ -76,15 +95,6 @@ def get_lines(path):
     else:
         lines = parse_text(path)
     return lines
-
-
-def lsplit(text):
-    # 改行文字で分割
-    li = text.split("\n")
-    # 0文字のものは除外
-    li = [l for l in li if len(l) != 0]
-    pyperclip.copy(repr(li))
-    return li
 
 
 def parse_ipynb(path):

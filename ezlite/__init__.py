@@ -1,49 +1,32 @@
 import glob
 import os
+from functools import partial
 from itertools import tee
 
 from .utils import *
 
+# 関数一覧
+# upgrade, template, p, lsplit, todt, psplit, sniff
+
 # TODO
-# templateはよく使うやつ全部書いとく
+# sniffのリファクタリング
 # typehint
 # docstring
+
+upgrade = partial(print_copy, code=INSTALL_CMD)
+template = partial(print_copy, code=TEMPLATE)
 
 
 def p():
     raise Exception("pause")
 
 
-def upgrade(*, pp=True):
-    code = "pip install git+https://github.com/Taichi-Ibi/ezlite --upgrade"
-    print_copy(code, pp)
-    return None
-
-
-# TODO
-def ready(*modules, template=False, pp=True):
-    if template is True:
-        modules = [
-            "glob",
-            "os",
-            "from datetime import datetime",
-            "from dateutil import relativedelta",
-            "",
-            "numpy as np",
-            "pandas as pd",
-        ]
-    else:
-        modules = sorted(modules)
-    line = []
-    for m in modules:
-        if m.startswith("from "):
-            line.append(m)
-        elif m != "":
-            line.append(f"import {m}")
-        else:
-            line.append("")
-    code = ("\n").join(line)
-    print_copy(code, pp)
+def lsplit(text, pp=True):
+    # 改行文字で分割
+    li = text.split("\n")
+    # 0文字のものは除外
+    li = [l for l in li if len(l) != 0]
+    print_copy(repr(li), pp=pp)
     return None
 
 
@@ -66,7 +49,7 @@ def todt(
         code += ", errors='coerce')"
     else:
         code += ")"
-    print_copy(code, pp)
+    print_copy(code, pp=pp)
     return None
 
 
@@ -103,7 +86,7 @@ def psplit(path, *, multiline=False, pp=True):
         code = (join_s).join([path_front, path_back])
         code = f"os.path.join({code}{left_sep})"
 
-        print_copy(code, pp)
+        print_copy(code, pp=pp)
         return None
     else:
         return None
@@ -136,7 +119,7 @@ def sniff(
     # イテレータをコピー
     paths, _paths = tee(paths)
     # 検索対象が一定値以上の場合に警告を表示
-    check_itr(_paths, 1000)
+    check_itr(_paths, file_count=1000)
 
     # 検索結果を辞書に追加
     result = []
@@ -177,24 +160,24 @@ def sniff(
     for r in result:
         small_output = []
         # -nの処理 ファイル名を表示
-        if show_filename:
+        if show_filename is True:
             path = "- " + r.get("path")
             # -cの処理 マッチ数を表示
             if count:
                 path += " " + str(r.get("count"))
             small_output.append(path)
         # -rの処理 検索結果を表示
-        if show_content:
+        if show_content is True:
             idxs = r.get("index_added")
             for itr, idx in enumerate(idxs):
                 line = r.get("lines")[idx]
                 # -iの処理 行番号を表示
-                if decoration:
+                if decoration is True:
                     line = "  ".join([str(idx).rjust(r.get("max_digits")), line])
                 # -mの処理 マッチした行をハイライト
-                if not decoration:
+                if not decoration is True:
                     pass
-                elif (decoration) & (idx in r.get("index")):
+                elif (decoration is True) & (idx in r.get("index")):
                     line = "* " + line
                 else:
                     line = "  " + line
