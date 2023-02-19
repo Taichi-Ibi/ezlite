@@ -9,8 +9,6 @@ from .utils import *
 # upgrade, template, p, lsplit, todt, psplit, sniff
 
 # TODO
-# sniffの出力部分リファクタリング
-# 逐次出力
 # typehint
 # docstring
 
@@ -137,41 +135,17 @@ def sniff(
                 print(f"ヒット数が{limit}を超えたので検索を中断しました。")
             break
 
-    # 出力を作成
+    # 出力内容を作成
     output_li = []
     for result_di in result_li:
         output = []
         # ファイル名とヒット数を取得
-        path = get_filename(result_di, show_filename, count)
-        output.append(path)
-        # 検索結果を表示
-        if show_content is True:
-            idxs = result_di.get("index_added")
-            for itr, idx in enumerate(idxs):
-                line = result_di.get("lines")[idx]
-                # 行番号とヒット行に*を表示
-                if decoration is True:
-                    # ヒットマーク
-                    if idx in result_di.get("indexs"):
-                        head = "* "
-                    else:
-                        head = "  "
-                    # 行番号
-                    line = head + "  ".join(
-                        [str(idx).rjust(result_di.get("max_digits")), line]
-                    )
-                # 1行目ではなくて、行番号が2以上離れている場合は改行
-                idxs_diff = idxs[itr] - idxs[itr - 1]
-                if (itr != 0) & (idxs_diff != 1):
-                    output.append("")
-                # 行を出力リストに追加
-                output.append(line)
-            # ファイルごとに改行
-            output.append("")
+        output += [get_filename(result_di, show_filename, count)]
+        # 検索結果を追加
+        output += get_hits(result_di, show_content, decoration)
         # 検索結果をリストに追加
         output_li.append(output)
 
     # 出力
-    print()
     print_2dlist(outer_li=output_li)
     return None

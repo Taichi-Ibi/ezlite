@@ -24,15 +24,46 @@ import seaborn as sns
 """
 
 
+def get_hits(result_di, show_content, decoration):
+    if show_content is True:
+        idxs = result_di.get("index_added")
+        content = []
+        for itr, idx in enumerate(idxs):
+            line = result_di.get("lines")[idx]
+            # 行番号とヒット行に*を表示
+            if decoration is True:
+                # ヒットマーク
+                if idx in result_di.get("indexs"):
+                    head = "* "
+                else:
+                    head = "  "
+                # 行番号
+                line = head + "  ".join(
+                    [str(idx).rjust(result_di.get("max_digits")), line]
+                )
+            # 1行目ではなくて、行番号が2以上離れている場合は改行
+            idxs_diff = idxs[itr] - idxs[itr - 1]
+            if (itr != 0) & (idxs_diff != 1):
+                content.append("")
+            # 行を出力リストに追加
+            content.append(line)
+        # ファイルごとに改行
+        content.append("")
+        return content
+    else:
+        return []
+
+
 def get_filename(result, show_filename, count):
-    path = ""
     if show_filename is True:
         # ファイル名を表示
         path = "- " + result.get("path")
         if count is True:
             # マッチ数を表示
             path += " " + str(result.get("count"))
-    return path
+        return path
+    else:
+        return ""
 
 
 def get_search_result(path, word, n_neighbors):
