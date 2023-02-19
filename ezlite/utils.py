@@ -60,7 +60,7 @@ def shape_code(obj, *, left, right, multiline=False):
         obj = obj.replace(",", ",\n    ")
         # 文字列の前後でも改行
         left += "\n    "
-        right = "\n    " + right
+        right = "\n" + right
     else:
         # カンマの後にスペース
         obj = obj.replace(",", ", ")
@@ -186,7 +186,7 @@ def get_matched_idxs(lines, word):
         if word in line:
             idxs_matched.append(idx)
         else:
-            pass
+            return []
     return idxs_matched
 
 

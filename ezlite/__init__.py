@@ -9,7 +9,7 @@ from .utils import *
 # upgrade, template, p, lsplit, todt, psplit, sniff
 
 # TODO
-# sniffのリファクタリング
+# sniffの出力部分リファクタリング
 # typehint
 # docstring
 
@@ -94,7 +94,7 @@ def sniff(
     pattern,
     *,
     environ=None,
-    limit=20,
+    limit=(DEFAULT_LIMIT := 20),
     n_neighbors=2,
     count=True,
     decoration=False,
@@ -102,22 +102,17 @@ def sniff(
     show_content=True,
     show_filename=True,
 ):
-    """処理の流れ
-    検索パターン作成
-    検索ファイル取得
-    ファイル検索・インデックス取得
-    出力
-    """
     # 環境変数で親ディレクトリを取得
     upper_dir = get_upper_dir(environ)
-    # 絶対パスの場合はuppper_dirが重複するので空白に置き換え
+    # 引数が絶対パスの場合はuppper_dirが重複するので空白に置き換え
     pattern = pattern.replace(upper_dir + "/", "")
     # 親ディレクトリとパターンを結合
-    _pattern = os.path.join(upper_dir, pattern)
-    # パスのブラケットをglob用にescapeする
-    _pattern = escape_brackets(_pattern)
+    pattern = os.path.join(upper_dir, pattern)
+    # パスの[]をglob用にescapeする
+    pattern = escape_brackets(pattern)
     # サーチするパスのリストをイテレータで取得
-    paths = glob.iglob(_pattern, recursive=True)
+    paths = glob.iglob(pattern, recursive=True)
+
     # イテレータをコピー
     paths, _paths = tee(paths)
     # 検索対象が一定値以上の場合に警告を表示
@@ -135,7 +130,7 @@ def sniff(
             result_li.append(result_di)
         # ヒット数にlimitを設定
         if (limit is not None) & (len(result_li) == limit):
-            if limit == 20:
+            if limit == DEFAULT_LIMIT:
                 print(f"ヒット数が{limit}を超えたので検索を中断しました。")
             break
 
@@ -178,3 +173,4 @@ def sniff(
 
     # 出力
     print_2dlist(big_li=big_output)
+    return None
