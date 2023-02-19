@@ -10,6 +10,7 @@ from .utils import *
 
 # TODO
 # sniffの出力部分リファクタリング
+# 逐次出力
 # typehint
 # docstring
 
@@ -98,7 +99,6 @@ def sniff(
     n_neighbors=2,
     count=True,
     decoration=False,
-    sep=True,
     show_content=True,
     show_filename=True,
 ):
@@ -115,10 +115,13 @@ def sniff(
 
     # イテレータをコピー
     paths, _paths = tee(paths)
-    # 検索対象が一定値以上の場合に警告を表示
-    file_count = 1000
-    if too_many_object(_paths, file_count) is True:
-        print(f"検索対象ファイル数が{file_count}を超えています。\n")
+    # 検索対象ファイル数を表示
+    COUNT_LIMIT = 1000
+    file_count = count_itr(_paths, COUNT_LIMIT)
+    if file_count == COUNT_LIMIT:
+        print(f"検索対象ファイル数が{COUNT_LIMIT}を超えています。")
+    else:
+        print(f"検索対象ファイル数は{file_count}です。")
 
     # 検索結果を辞書に追加
     result_li = []
@@ -135,42 +138,40 @@ def sniff(
             break
 
     # 出力を作成
-    big_output = []
-    for result in result_li:
-        small_output = []
-        # -nの処理 ファイル名を表示
-        if show_filename is True:
-            path = "- " + result.get("path")
-            # -cの処理 マッチ数を表示
-            if count:
-                path += " " + str(result.get("count"))
-            small_output.append(path)
-        # -rの処理 検索結果を表示
+    output_li = []
+    for result_di in result_li:
+        output = []
+        # ファイル名とヒット数を取得
+        path = get_filename(result_di, show_filename, count)
+        output.append(path)
+        # 検索結果を表示
         if show_content is True:
-            idxs = result.get("index_added")
+            idxs = result_di.get("index_added")
             for itr, idx in enumerate(idxs):
-                line = result.get("lines")[idx]
-                # -iの処理 行番号を表示
+                line = result_di.get("lines")[idx]
+                # 行番号とヒット行に*を表示
                 if decoration is True:
-                    line = "  ".join([str(idx).rjust(result.get("max_digits")), line])
-                # -mの処理 マッチした行をハイライト
-                if not decoration is True:
-                    pass
-                elif (decoration is True) & (idx in result.get("indexs")):
-                    line = "* " + line
-                else:
-                    line = "  " + line
-                # -sの処理 1/2 マッチごとに改行
-                if (sep is True) & (itr != 0) & ((idxs[itr] - idxs[itr - 1]) != 1):
-                    small_output.append("\n")
+                    # ヒットマーク
+                    if idx in result_di.get("indexs"):
+                        head = "* "
+                    else:
+                        head = "  "
+                    # 行番号
+                    line = head + "  ".join(
+                        [str(idx).rjust(result_di.get("max_digits")), line]
+                    )
+                # 1行目ではなくて、行番号が2以上離れている場合は改行
+                idxs_diff = idxs[itr] - idxs[itr - 1]
+                if (itr != 0) & (idxs_diff != 1):
+                    output.append("")
                 # 行を出力リストに追加
-                small_output.append(line)
-            # -sの処理 2/2 ファイルごとに改行
-            if sep is True:
-                small_output.append("\n")
+                output.append(line)
+            # ファイルごとに改行
+            output.append("")
         # 検索結果をリストに追加
-        big_output.append(small_output)
+        output_li.append(output)
 
     # 出力
-    print_2dlist(big_li=big_output)
+    print()
+    print_2dlist(outer_li=output_li)
     return None

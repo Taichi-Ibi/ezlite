@@ -24,6 +24,17 @@ import seaborn as sns
 """
 
 
+def get_filename(result, show_filename, count):
+    path = ""
+    if show_filename is True:
+        # ファイル名を表示
+        path = "- " + result.get("path")
+        if count is True:
+            # マッチ数を表示
+            path += " " + str(result.get("count"))
+    return path
+
+
 def get_search_result(path, word, n_neighbors):
     # 行ごとにリスト化
     lines = get_lines(path)
@@ -50,7 +61,7 @@ def get_search_result(path, word, n_neighbors):
             "index_added": _indexs,
             "max_digits": max_digits,
         }
-    return result_di
+        return result_di
 
 
 def shape_code(obj, *, left, right, multiline=False):
@@ -69,20 +80,22 @@ def shape_code(obj, *, left, right, multiline=False):
     return code
 
 
-def print_2dlist(big_li):
+def print_2dlist(outer_li):
     """入れ子になったリストをprintする"""
-    for lines in big_li:
+    for lines in outer_li:
         for line in lines:
             print(line)
     return None
 
 
-def too_many_object(itr, file_count):
+def count_itr(itr, count_limit):
     """イテレータの長さがfile_count以上ならTrueを返す"""
     for tpl in enumerate(itr):
-        if tpl[0] == file_count:
-            return True
-    return False
+        if tpl[0] < count_limit:
+            pass
+        else:
+            return count_limit
+    return tpl[0]
 
 
 def escape_brackets(path):
@@ -186,7 +199,7 @@ def get_matched_idxs(lines, word):
         if word in line:
             idxs_matched.append(idx)
         else:
-            return []
+            pass
     return idxs_matched
 
 
