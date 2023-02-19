@@ -121,80 +121,57 @@ def sniff(
     # イテレータをコピー
     paths, _paths = tee(paths)
     # 検索対象が一定値以上の場合に警告を表示
-    check_itr(_paths, file_count=1000)
+    file_count = 1000
+    if too_many_object(_paths, file_count) is True:
+        print(f"検索対象ファイル数が{file_count}を超えています。\n")
 
     # 検索結果を辞書に追加
     result_li = []
     for path in paths:
-        # 行ごとにリスト化
-        lines = get_lines(path)
-        # マッチしたindexを取得
-        indexs = get_matched_idxs(lines, word=word)
-
-        if indexs == []:
-            # マッチした行がない場合はpass
-            pass
-        else:
-            # マッチした行数を取得
-            count = len(indexs)
-            # n_neighborsの数だけ前後の行を取得する
-            _indexs = collect_neighbor(indexs, n_neighbors=n_neighbors)
-            # マッチした行の最大桁数を取得
-            max_digits = len(str(max(_indexs)))
-            # ファイルの行数からはみ出たものは除外
-            _indexs = [i for i in _indexs if i in range(0, len(lines))]
-
-            # dictに格納
-            result_di = {
-                "path": path,
-                "lines": lines,
-                "indexs": indexs,
-                "count": count,
-                "index_added": _indexs,
-                "max_digits": max_digits,
-            }
-            # 検索結果をリストに追加
+        # 検索結果を取得
+        result_di = get_search_result(path, word, n_neighbors)
+        # 検索結果をリストに追加
+        if result_di != {}:
             result_li.append(result_di)
-
-            # ヒット数にlimitを設定
-            if (limit is not None) & (len(result_li) == limit):
-                if limit == 20:
-                    print(f"ヒット数が{limit}を超えたので検索を中断しました。")
-                break
+        # ヒット数にlimitを設定
+        if (limit is not None) & (len(result_li) == limit):
+            if limit == 20:
+                print(f"ヒット数が{limit}を超えたので検索を中断しました。")
+            break
 
     # 出力を作成
     big_output = []
-    for r in result_li:
+    for result in result_li:
         small_output = []
         # -nの処理 ファイル名を表示
         if show_filename is True:
-            path = "- " + r.get("path")
+            path = "- " + result.get("path")
             # -cの処理 マッチ数を表示
             if count:
-                path += " " + str(r.get("count"))
+                path += " " + str(result.get("count"))
             small_output.append(path)
         # -rの処理 検索結果を表示
         if show_content is True:
-            idxs = r.get("index_added")
+            idxs = result.get("index_added")
             for itr, idx in enumerate(idxs):
-                line = r.get("lines")[idx]
+                line = result.get("lines")[idx]
                 # -iの処理 行番号を表示
                 if decoration is True:
-                    line = "  ".join([str(idx).rjust(r.get("max_digits")), line])
+                    line = "  ".join([str(idx).rjust(result.get("max_digits")), line])
                 # -mの処理 マッチした行をハイライト
                 if not decoration is True:
                     pass
-                elif (decoration is True) & (idx in r.get("indexs")):
+                elif (decoration is True) & (idx in result.get("indexs")):
                     line = "* " + line
                 else:
                     line = "  " + line
                 # -sの処理 1/2 マッチごとに改行
-                if (sep) & (itr != 0) & ((idxs[itr] - idxs[itr - 1]) != 1):
+                if (sep is True) & (itr != 0) & ((idxs[itr] - idxs[itr - 1]) != 1):
                     small_output.append("\n")
                 # 行を出力リストに追加
                 small_output.append(line)
             # -sの処理 2/2 ファイルごとに改行
-            if sep:
+            if sep is True:
                 small_output.append("\n")
         # 検索結果をリストに追加
         big_output.append(small_output)

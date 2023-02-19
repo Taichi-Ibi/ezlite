@@ -24,6 +24,35 @@ import seaborn as sns
 """
 
 
+def get_search_result(path, word, n_neighbors):
+    # 行ごとにリスト化
+    lines = get_lines(path)
+    # マッチしたindexを取得
+    indexs = get_matched_idxs(lines, word=word)
+    if indexs == []:
+        # マッチした行がない場合はpass
+        return {}
+    else:
+        # マッチした行数を取得
+        count = len(indexs)
+        # n_neighborsの数だけ前後の行を取得する
+        _indexs = collect_neighbors(indexs, n_neighbors=n_neighbors)
+        # マッチした行の最大桁数を取得
+        max_digits = len(str(max(_indexs)))
+        # ファイルの行数からはみ出たものは除外
+        _indexs = [i for i in _indexs if i in range(0, len(lines))]
+        # dictに格納
+        result_di = {
+            "path": path,
+            "lines": lines,
+            "indexs": indexs,
+            "count": count,
+            "index_added": _indexs,
+            "max_digits": max_digits,
+        }
+    return result_di
+
+
 def shape_code(obj, *, left, right, multiline=False):
     """文字列をコードをとして使えるように整形する"""
     if multiline is True:
@@ -48,13 +77,12 @@ def print_2dlist(big_li):
     return None
 
 
-def check_itr(itr, file_count):
-    """イテレータの長さがfile_count以上かをチェックする"""
+def too_many_object(itr, file_count):
+    """イテレータの長さがfile_count以上ならTrueを返す"""
     for tpl in enumerate(itr):
         if tpl[0] == file_count:
-            print(f"検索対象ファイル数が{file_count}を超えています。\n")
-            break
-    return None
+            return True
+    return False
 
 
 def escape_brackets(path):
@@ -162,7 +190,7 @@ def get_matched_idxs(lines, word):
     return idxs_matched
 
 
-def collect_neighbor(num_list, n_neighbors):
+def collect_neighbors(num_list, n_neighbors):
     """リストの各数値の前後nの範囲の数値を追加して重複を除外する
     >>> collect_neighbor([2, 10], 1, 2)
     [1, 2, 3, 4, 9, 10, 11, 12]
