@@ -13,8 +13,8 @@ from .utils import *
 # typehint
 # docstring
 
-upgrade = partial(print_copy, code=INSTALL_CMD)
-template = partial(print_copy, code=TEMPLATE)
+upgrade = partial(pNc, code=INSTALL_CMD)
+template = partial(pNc, code=TEMPLATE)
 
 
 def p():
@@ -23,14 +23,14 @@ def p():
 
 def lsplit(text, *, multiline=False, pp=True):
     # 改行文字で分割
-    li = text.strip().split("\n")
-    # 0文字のものは除外
-    li = [l for l in li if len(l) != 0]
-    # リストを文字列に変換
-    code = repr(li)
-    # コードを整形
-    code = shape_code(code, multiline)
-    print_copy(code, pp=pp)
+    text_li = text.strip().split("\n")
+    # 0文字のものは除外し、クォーテーションを付ける
+    text_li = [repr(t) for t in text_li if len(t) != 0]
+    # 結合して文字列にする
+    obj = (",").join(text_li)
+    # codeに変換
+    code = shape_code(obj, left="[", right="]", multiline=multiline)
+    pNc(code, pp=pp)
     return None
 
 
@@ -46,54 +46,46 @@ def todt(
     # 日付形式
     format = fmt.replace("y", "Y")
     format = sep.join(["%" + s for s in list(format)])
-    # コード作成
-    code = f"{new_srs} = pd.to_datetime({old_srs}, format='{format}'"
     # エラー対応
-    if error_handling:
-        code += ", errors='coerce')"
+    if error_handling is True:
+        tail = ", errors='coerce'"
     else:
-        code += ")"
-    print_copy(code, pp=pp)
+        tail = ""
+    # コード作成
+    code = f"{new_srs} = pd.to_datetime({old_srs}, format='{format}'{tail})"
+    pNc(code, pp=pp)
     return None
 
 
 def psplit(path, *, multiline=False, pp=True):
-
-    # 絶対パスに変更
+    # 絶対パスに変換
     path = ref2abs(path)
-
     # 同じ文字を含む環境変数を抽出
     envs = {k: v for k, v in dict(os.environ).items() if v in path}
-    sep_s = fix_sep(path)
     if len(envs):
-        # パスの文字数が最も多い環境変数を取得
+        # 環境変数をパスの文字数で降順にソート
         envs_sorted = dict(sorted(envs.items(), key=lambda x: -len(x[1])))
+        # 1番目のキーを取得
         env = next(iter(envs_sorted))
 
-        # 整形のための文字を定義
-        left_sep, right_sep = "", ""
-        if multiline is True:
-            left_sep = "\n    "
-        else:
-            right_sep = " "
+        # 環境変数で置き換える部分は一旦除外
+        obj = path.replace(os.getenv(env), "")
+        # 区切り文字を取得(Windowsはバックスラッシュ)
+        sep_s = fix_sep(path)
 
-        # 環境変数
-        path_front = f"{left_sep}os.getenv('{env}')"
-
-        # 環境変数以降のパスの整形
-        join_s = f",{right_sep}"
-        path_back = path.replace(os.getenv(env), "").strip(sep_s).split(sep_s)
-        path_back = [f"{left_sep}'{p}'" for p in path_back]
-        path_back = (join_s).join(path_back)
-
-        # 環境変数部分とそれ以降を結合
-        code = (join_s).join([path_front, path_back])
-        code = f"os.path.join({code}{left_sep})"
-
-        print_copy(code, pp=pp)
-        return None
+        # 環境変数以降のパスをリスト化
+        obj_li = obj.strip(sep_s).split(sep_s)
+        obj_li = [repr(p) for p in obj_li]
+        # 環境変数部分を追加
+        obj_li = [f'os.getenv("{env}")'] + obj_li
+        # 結合して文字列にする
+        obj = (",").join(obj_li)
+        # コードに変換
+        code = shape_code(obj, left="os.path.join(", right=")", multiline=multiline)
+        pNc(code)
     else:
-        return None
+        pass
+    return None
 
 
 def sniff(

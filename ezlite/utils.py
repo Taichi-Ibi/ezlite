@@ -24,19 +24,24 @@ import seaborn as sns
 """
 
 
-def shape_code(code, multiline):
+def shape_code(obj, *, left, right, multiline=False):
+    """文字列をコードをとして使えるように整形する"""
     if multiline is True:
-        # カンマの後ろにはスペースが1つ入っているので注意
-        sep = "\n" + " " * 4
-        code = code.replace("[", f"[{sep}")
-        code = code.replace(", ", ",").replace(",", f",{sep}")
-        code = code.replace("]", f"{sep}]")
+        # カンマの後、改行とインデント
+        obj = obj.replace(",", ",\n    ")
+        # 文字列の前後でも改行
+        left += "\n    "
+        right = "\n    " + right
     else:
-        pass
+        # カンマの後にスペース
+        obj = obj.replace(",", ", ")
+    # 前後の文字を結合
+    code = left + obj + right
     return code
 
 
 def print_2dlist(big_li):
+    """入れ子になったリストをprintする"""
     for lines in big_li:
         for line in lines:
             print(line)
@@ -44,6 +49,7 @@ def print_2dlist(big_li):
 
 
 def check_itr(itr, file_count):
+    """イテレータの長さがfile_count以上かをチェックする"""
     for tpl in enumerate(itr):
         if tpl[0] == file_count:
             print(f"検索対象ファイル数が{file_count}を超えています。\n")
@@ -52,7 +58,7 @@ def check_itr(itr, file_count):
 
 
 def escape_brackets(path):
-    # globは[]を正規表現パターンとして認識してしまうためエスケープする
+    """globは[]を正規表現パターンとして認識してしまうためエスケープする"""
     replace_list = [["[", "[[[", "[[]"], ["]", "]]]", "[]]"]]
     path = path.replace(replace_list[0][0], replace_list[0][1])
     path = path.replace(replace_list[1][0], replace_list[1][1])
@@ -68,7 +74,7 @@ def ref2abs(path):
     return abs_path
 
 
-def print_copy(code, *, pp=True):
+def pNc(code, *, pp=True):
     code = code.strip()
     print(code)
     if pp is True:
