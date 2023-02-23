@@ -24,6 +24,89 @@ import seaborn as sns
 """
 
 
+def multi_replace(string, mapping):
+    """
+    文字列中の複数の文字列やパターンを同時に置換します。
+    .replace を連ねる場合と違い、ある置換結果がさらに別の置換を受けてしまうことはありません。
+    よって二つのワードを相互に入れ替えることもできます。
+
+    mapping: 検索対象をキー、その置換文字列を値とする辞書。
+        キーとしてstrまたはreパターンオブジェクトを指定できる。
+        キーがreパターンオブジェクトの場合は、置換文字列中でグループ参照 '\\1', '\\2',... が有効。
+    """
+    catch_all_pattern = "|".join(map(to_pattern, mapping))
+    replacer = make_replacer(mapping)
+    return re.subn(catch_all_pattern, replacer, string)[0]
+
+
+_PatternType = type(
+    re.compile("")
+)  # workaround for Python which does't have typing module
+
+
+def to_pattern(key):
+    if isinstance(key, str):
+        return "(" + re.escape(key) + ")"
+    elif isinstance(key, _PatternType):
+        return "(" + key.pattern + ")"
+    else:
+        raise Exception("Failed to replace!")
+
+
+def make_replacer(mapping):
+    def _replacer(match):
+        src = match.group(0)
+        for key, val in mapping.items():
+            if src == key:
+                return val
+            elif isinstance(key, _PatternType) and re.match(
+                "(?:" + key.pattern + r")\Z", src
+            ):  # workaround for Python which doesn't have re.fullmatch
+                return key.sub(val, src)
+
+    return _replacer
+
+
+def grouping_next(idx_li):
+    group_idxs, tmp_li = [], []
+    for i, l in enumerate(idx_li):
+        if i == 0:
+            # 先頭のidxを格納
+            tmp_li.append(l)
+        else:
+            # 先頭以外
+            if idx_li[i] - idx_li[i - 1] == 1:
+                # idxが連続している場合は一時リストに追加
+                tmp_li.append(l)
+            else:
+                # idxが連続していない場合は一時リストをインデックスグループに追加し、一時リストに追加
+                group_idxs.append(tmp_li)
+                tmp_li = []
+                tmp_li.append(l)
+            if i + 1 == len(idx_li):
+                # 末尾の場合は一時リストを単語idxリストに追加
+                group_idxs.append(tmp_li)
+    return group_idxs
+
+
+def search_jp(code, ignore_num, ignore_kakko):
+    # 日本語とアンダーバーの正規表現パターン
+    ptn = r"[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f|_|-"
+    if ignore_num == False:
+        ptn += r"|\d"
+    if ignore_kakko == False:
+        ptn += r"|\(|\)"
+    ptn += r"]"
+    # 正規表現で検索（マッチオブジェクトが返ってくる）
+    matches = re.finditer(ptn, code)
+    # マッチした位置をリストに格納
+    matched_idxs = []
+    for m in matches:
+        idx = m.start()
+        matched_idxs.append(idx)
+    return matched_idxs
+
+
 def get_hits(result_di, show_content, decoration):
     if show_content is True:
         idxs = result_di.get("index_added")
@@ -127,16 +210,6 @@ def count_itr(itr, count_limit):
         else:
             return count_limit
     return tpl[0]
-
-
-def escape_brackets(path):
-    """globは[]を正規表現パターンとして認識してしまうためエスケープする"""
-    replace_list = [["[", "[[[", "[[]"], ["]", "]]]", "[]]"]]
-    path = path.replace(replace_list[0][0], replace_list[0][1])
-    path = path.replace(replace_list[1][0], replace_list[1][1])
-    path = path.replace(replace_list[0][1], replace_list[0][2])
-    path = path.replace(replace_list[1][1], replace_list[1][2])
-    return path
 
 
 def ref2abs(path):

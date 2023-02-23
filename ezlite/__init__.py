@@ -81,9 +81,40 @@ def psplit(path, *, multiline=False, pp=True):
         obj = (",").join(obj_li)
         # コードに変換
         code = shape_code(obj, left="os.path.join(", right=")", multiline=multiline)
-        pNc(code)
+        pNc(code, pp=pp)
     else:
         pass
+    return None
+
+
+def j(code, *, min_moji=2, ignore_num=False, ignore_kakko=True, pp=True):
+    # 日本語とアンダーバーがマッチする位置を取得
+    matched_idxs = search_jp(code, ignore_num=ignore_num, ignore_kakko=ignore_kakko)
+    # idxが連続していたら同じリストに追加
+    group_idxs = grouping_next(matched_idxs)
+    # idxを単語にする
+    word_li = []
+    for idxs in group_idxs:
+        tmp_li = []
+        if len(idxs) < min_moji:
+            # デフォルトは1文字だけの場合スキップ
+            pass
+        else:
+            for idx in idxs:
+                # 1文字ずつ追加
+                tmp_li.append(code[idx])
+            # 文字を繋げて単語にする
+            word = ("").join(tmp_li)
+            # 単語をリストに追加
+            word_li.append(word)
+    # 重複マッチ回避のため、文字数で高順に並べ替え
+    word_li = sorted(word_li, key=lambda x: -len(x))
+    # 辞書を使って文字列を一度に置換
+    replace_di = {}
+    for word in word_li:
+        replace_di[word] = f"'{word}'"
+    code = multi_replace(code, replace_di)
+    pNc(code, pp=pp)
     return None
 
 
@@ -107,7 +138,7 @@ def sniff(
     # 親ディレクトリとパターンを結合
     pattern = os.path.join(upper_dir, pattern)
     # パスの[]をglob用にescapeする
-    pattern = escape_brackets(pattern)
+    pattern = multi_replace(pattern, {"[": "[[]", "]": "[]]"})
     # サーチするパスのリストをイテレータで取得
     paths = glob.iglob(pattern, recursive=True)
 
