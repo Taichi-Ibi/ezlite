@@ -8,19 +8,26 @@ from .utils import *
 # 関数一覧
 # upgrade, template, p, lsplit, todt, psplit, sniff
 
-# TODO
-# typehint
-# docstring
-
 upgrade = partial(pNc, code=INSTALL_CMD)
 template = partial(pNc, code=TEMPLATE)
 
 
 def p():
+    """スクリプトの実行を中断する"""
     raise Exception("pause")
 
 
-def lsplit(text, *, multiline=False, pp=True):
+def lsplit(text: str, *, multiline=False, pp=True) -> None:
+    """三連引用符を使った複数行にわたる文字列をリストに変換する
+
+    Args:
+        text (str: 文字列
+        multiline (bool, optional): リストをカンマ区切りで改行するかどうか Defaults to False.
+        pp (bool, optional): クリップボードにコピーするかどうか Defaults to True.
+
+    Returns:
+        _type_: None
+    """
     # 改行文字で分割
     text_li = text.strip().split("\n")
     # 0文字のものは除外し、クォーテーションを付ける
@@ -34,8 +41,30 @@ def lsplit(text, *, multiline=False, pp=True):
 
 
 def todt(
-    df_name, /, col, *, fmt="ymd", sep="-", new_col=None, error_handling=True, pp=True
-):
+    df_name: str,
+    /,
+    col: str,
+    *,
+    fmt="ymd",
+    sep="-",
+    new_col=None,
+    error_handling=True,
+    pp=True,
+) -> None:
+    """DataFrameとカラム名を受け取ってdatetime型に変換するコードを生成する
+
+    Args:
+        df_name (str): DataFrameの名前 example:'df'
+        col (str): カラム名 example: ''年月日'
+        fmt (str, optional): ymdやymなど日付形式を指定 Defaults to "ymd".
+        sep (str, optional): 変換前のカラム名の区切り文字。ない場合は""とする Defaults to "-".
+        new_col (str, optional): 新しくカラムを作るときは入力する Defaults to None.
+        error_handling (bool, optional): errors='coerce'のオプションをつけるかどうか Defaults to True.
+        pp (bool, optional): クリップボードにコピーするかどうか Defaults to True.
+
+    Returns:
+        _type_: None
+    """
     # 変換対象のカラム
     old_srs = f"{df_name}['{col}']"
     if new_col is None:
@@ -56,7 +85,17 @@ def todt(
     return None
 
 
-def psplit(path, *, multiline=False, pp=True):
+def psplit(path: str, *, multiline=False, pp=True) -> None:
+    """絶対パスや相対パスを環境変数を使って書き換える
+
+    Args:
+        path (str): 変換対象となるパス
+        multiline (bool, optional): パスをカンマ区切りで改行するかどうか Defaults to False.
+        pp (bool, optional): クリップボードにコピーするかどうか Defaults to True.
+
+    Returns:
+        _type_: None
+    """
     # 絶対パスに変換
     path = ref2abs(path)
     # 同じ文字を含む環境変数を抽出
@@ -87,7 +126,19 @@ def psplit(path, *, multiline=False, pp=True):
     return None
 
 
-def j(code, *, min_moji=2, ignore_num=False, ignore_kakko=True, pp=True):
+def j(code: str, *, min_moji=2, ignore_num=False, ignore_kakko=True, pp=True) -> None:
+    """文字列中の日本語を判別してシングルクォーテーションを付ける
+
+    Args:
+        code (str): 変換前のコード
+        min_moji (int, optional): シングルクォーテーションを付ける対象となる最小文字数 Defaults to 2.
+        ignore_num (bool, optional): 数字を無視するかどうか Defaults to False.
+        ignore_kakko (bool, optional): 丸括弧を無視するかどうか Defaults to True.
+        pp (bool, optional): クリップボードにコピーするかどうか Defaults to True.
+
+    Returns:
+        _type_: None
+    """
     # 日本語とアンダーバーがマッチする位置を取得
     matched_idxs = search_jp(code, ignore_num=ignore_num, ignore_kakko=ignore_kakko)
     # idxが連続していたら同じリストに追加
@@ -119,9 +170,9 @@ def j(code, *, min_moji=2, ignore_num=False, ignore_kakko=True, pp=True):
 
 
 def sniff(
-    word,
+    word: str,
     /,
-    pattern,
+    pattern: str,
     *,
     environ=None,
     limit=(DEFAULT_LIMIT := 20),
@@ -130,7 +181,23 @@ def sniff(
     decoration=False,
     show_content=True,
     show_filename=True,
-):
+) -> None:
+    """正規表現で指定したファイルから指定した文字列を検索し表示する
+
+    Args:
+        word (str): 検索する文字列
+        pattern (str): 検索するファイルパスの正規表現パターン. **も使用可能
+        environ (_type_, optional): ホームパスではなく環境変数でパスを指定するときに使用 Defaults to None.
+        limit (tuple, optional): 検索結果を表示するファイル数 Defaults to (DEFAULT_LIMIT := 20).
+        n_neighbors (int, optional): 検索がマッチした行の前後n行を表示する Defaults to 2.
+        count (bool, optional): ファイルの末尾にマッチした行数を表示する Defaults to True.
+        decoration (bool, optional): 検索結果の左端に、行番号とマッチした行の目印を表示する Defaults to False.
+        show_content (bool, optional): 検索結果を表示する. Falseの場合、ファイル名のみ表示 Defaults to True.
+        show_filename (bool, optional): 検索結果にファイル名を表示する Defaults to True.
+
+    Returns:
+        _type_: _description_
+    """
     # 環境変数で親ディレクトリを取得
     upper_dir = get_upper_dir(environ)
     # 引数が絶対パスの場合はuppper_dirが重複するので空白に置き換え
