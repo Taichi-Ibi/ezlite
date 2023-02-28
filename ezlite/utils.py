@@ -299,11 +299,12 @@ def parse_text(path):
 def get_matched_idxs(lines, word):
     """サーチする文字列が含まれるリストの番号を返す"""
     idxs_matched = []
-    for idx, line in enumerate(lines):
-        if word in line:
-            idxs_matched.append(idx)
-        else:
-            pass
+    if lines:
+        for idx, line in enumerate(lines):
+            if word in line:
+                idxs_matched.append(idx)
+            else:
+                pass
     return idxs_matched
 
 
