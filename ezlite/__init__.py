@@ -85,7 +85,7 @@ def todt(
     return None
 
 
-def psplit(path: str, *, multiline=False, pp=True) -> None:
+def psplit(path="", *, multiline=False, pp=True) -> None:
     """絶対パスや相対パスを環境変数を使って書き換える
 
     Args:
@@ -96,6 +96,9 @@ def psplit(path: str, *, multiline=False, pp=True) -> None:
     Returns:
         _type_: None
     """
+    if path == "":
+        # 引数がない場合はクリップボードからコピー
+        path = pyperclip.paste()
     # 絶対パスに変換
     path = ref2abs(path)
     # 同じ文字を含む環境変数を抽出
