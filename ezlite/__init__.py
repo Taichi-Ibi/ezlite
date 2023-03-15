@@ -17,12 +17,12 @@ def p():
     raise Exception("pause")
 
 
-def lsplit(text: str, *, multiline=False, pp=True) -> None:
+def lsplit(text: str, *, multiline=True, pp=True) -> None:
     """三連引用符を使った複数行にわたる文字列をリストに変換する
 
     Args:
         text (str: 文字列
-        multiline (bool, optional): リストをカンマ区切りで改行するかどうか Defaults to False.
+        multiline (bool, optional): リストをカンマ区切りで改行するかどうか Defaults to True.
         pp (bool, optional): クリップボードにコピーするかどうか Defaults to True.
 
     Returns:
@@ -85,12 +85,12 @@ def todt(
     return None
 
 
-def psplit(path="", *, multiline=False, pp=True) -> None:
+def psplit(path="", *, multiline=True, pp=True) -> None:
     """絶対パスや相対パスを環境変数を使って書き換える
 
     Args:
         path (str): 変換対象となるパス
-        multiline (bool, optional): パスをカンマ区切りで改行するかどうか Defaults to False.
+        multiline (bool, optional): パスをカンマ区切りで改行するかどうか Defaults to True.
         pp (bool, optional): クリップボードにコピーするかどうか Defaults to True.
 
     Returns:
