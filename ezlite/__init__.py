@@ -14,7 +14,7 @@ template = partial(pNc, code=TEMPLATE)
 
 def p():
     """スクリプトの実行を中断する"""
-    raise Exception("pause")
+    raise Exception
 
 
 def lsplit(text: str, *, multiline=True, pp=True) -> None:
@@ -220,7 +220,7 @@ def sniff(
     if file_count == COUNT_LIMIT:
         print(f"検索対象ファイル数が{COUNT_LIMIT}を超えています。")
     else:
-        print(f"検索対象ファイル数は{file_count}です。")
+        print(f"検索対象ファイル数は{file_count+1}です。")
 
     # 検索結果を辞書に追加
     result_li = []
