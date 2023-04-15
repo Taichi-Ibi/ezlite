@@ -15,7 +15,7 @@ def p():
     raise Exception
 
 
-def lsplit(text: str, *, multiline=True, pp=True) -> str:
+def lsplit(text: str, *, multiline=True, pp=True) -> None:
     """三連引用符を使った複数行にわたる文字列をリストに変換する
 
     Args:
@@ -35,7 +35,7 @@ def lsplit(text: str, *, multiline=True, pp=True) -> str:
     # codeに変換
     code = shape_code(obj, left="[", right="]", multiline=multiline)
     pNc(code, pp=pp)
-    return code
+    return None
 
 
 def todt(
@@ -48,7 +48,7 @@ def todt(
     new_col=None,
     error_handling=True,
     pp=True,
-) -> str:
+) -> None:
     """DataFrameとカラム名を受け取ってdatetime型に変換するコードを生成する
 
     Args:
@@ -80,10 +80,10 @@ def todt(
     # コード作成
     code = f"{new_srs} = pd.to_datetime({old_srs}, format='{format}'{tail})"
     pNc(code, pp=pp)
-    return code
+    return None
 
 
-def psplit(path="", *, multiline=True, pp=True) -> str:
+def psplit(path="", *, multiline=True, pp=True) -> None:
     """絶対パスや相対パスを環境変数を使って書き換える
 
     Args:
@@ -124,10 +124,10 @@ def psplit(path="", *, multiline=True, pp=True) -> str:
         pNc(code, pp=pp)
     else:
         pass
-    return code
+    return None
 
 
-def j(code: str, *, min_moji=2, ignore_num=False, ignore_kakko=True, pp=True) -> str:
+def j(code: str, *, min_moji=2, ignore_num=False, ignore_kakko=True, pp=True) -> None:
     """文字列中の日本語を判別してシングルクォーテーションを付ける
 
     Args:
@@ -167,7 +167,7 @@ def j(code: str, *, min_moji=2, ignore_num=False, ignore_kakko=True, pp=True) ->
         replace_di[word] = f"'{word}'"
     code = multi_replace(code, replace_di)
     pNc(code, pp=pp)
-    return code
+    return None
 
 
 def sniff(
@@ -182,7 +182,7 @@ def sniff(
     decoration=False,
     show_content=True,
     show_filename=True,
-) -> str:
+) -> None:
     """正規表現で指定したファイルから指定した文字列を検索し表示する
 
     Args:
@@ -246,5 +246,5 @@ def sniff(
         output_li.append(output)
 
     # 出力
-    outputs = print_2dlist(outer_li=output_li)
-    return outputs
+    print_2dlist(outer_li=output_li)
+    return None

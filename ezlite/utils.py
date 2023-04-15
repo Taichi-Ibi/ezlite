@@ -196,11 +196,10 @@ def shape_code(obj, *, left, right, multiline=False):
 
 def print_2dlist(outer_li):
     """入れ子になったリストをprintする"""
-    outputs = ""
     for lines in outer_li:
         for line in lines:
-            outputs += line
-    return outputs
+            print(line)
+    return None
 
 
 def count_itr(itr, count_limit):
@@ -222,7 +221,7 @@ def ref2abs(path):
 
 def pNc(code, *, pp=True):
     code = code.strip()
-    # print(code)
+    print(code)
     if pp is True:
         try:
             pyperclip.copy(code)
