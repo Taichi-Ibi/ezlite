@@ -5,8 +5,6 @@ from itertools import tee
 
 from .utils import *
 
-# 関数一覧
-# upgrade, template, p, lsplit, todt, psplit, sniff
 
 upgrade = partial(pNc, code=INSTALL_CMD)
 template = partial(pNc, code=TEMPLATE)
@@ -17,7 +15,7 @@ def p():
     raise Exception
 
 
-def lsplit(text: str, *, multiline=True, pp=True) -> None:
+def lsplit(text: str, *, multiline=True, pp=True) -> str:
     """三連引用符を使った複数行にわたる文字列をリストに変換する
 
     Args:
@@ -37,7 +35,7 @@ def lsplit(text: str, *, multiline=True, pp=True) -> None:
     # codeに変換
     code = shape_code(obj, left="[", right="]", multiline=multiline)
     pNc(code, pp=pp)
-    return None
+    return code
 
 
 def todt(
@@ -50,7 +48,7 @@ def todt(
     new_col=None,
     error_handling=True,
     pp=True,
-) -> None:
+) -> str:
     """DataFrameとカラム名を受け取ってdatetime型に変換するコードを生成する
 
     Args:
@@ -82,10 +80,10 @@ def todt(
     # コード作成
     code = f"{new_srs} = pd.to_datetime({old_srs}, format='{format}'{tail})"
     pNc(code, pp=pp)
-    return None
+    return code
 
 
-def psplit(path="", *, multiline=True, pp=True) -> None:
+def psplit(path="", *, multiline=True, pp=True) -> str:
     """絶対パスや相対パスを環境変数を使って書き換える
 
     Args:
@@ -126,10 +124,10 @@ def psplit(path="", *, multiline=True, pp=True) -> None:
         pNc(code, pp=pp)
     else:
         pass
-    return None
+    return code
 
 
-def j(code: str, *, min_moji=2, ignore_num=False, ignore_kakko=True, pp=True) -> None:
+def j(code: str, *, min_moji=2, ignore_num=False, ignore_kakko=True, pp=True) -> str:
     """文字列中の日本語を判別してシングルクォーテーションを付ける
 
     Args:
@@ -169,7 +167,7 @@ def j(code: str, *, min_moji=2, ignore_num=False, ignore_kakko=True, pp=True) ->
         replace_di[word] = f"'{word}'"
     code = multi_replace(code, replace_di)
     pNc(code, pp=pp)
-    return None
+    return code
 
 
 def sniff(
@@ -184,7 +182,7 @@ def sniff(
     decoration=False,
     show_content=True,
     show_filename=True,
-) -> None:
+) -> str:
     """正規表現で指定したファイルから指定した文字列を検索し表示する
 
     Args:
@@ -248,5 +246,5 @@ def sniff(
         output_li.append(output)
 
     # 出力
-    print_2dlist(outer_li=output_li)
-    return None
+    outputs = print_2dlist(outer_li=output_li)
+    return outputs
