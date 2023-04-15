@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="ezlite",
-    version="0.2.9",
+    version="0.2.95",
     author="t.ibi",
     author_email="t.ibi@estyle-inc.jp",
     description="For the razy who wants to write programs with ease.",

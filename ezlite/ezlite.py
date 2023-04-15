@@ -3,11 +3,23 @@ import os
 from functools import partial
 from itertools import tee
 
+import isort
+import pyperclip
+
 from .utils import *
 
 
 upgrade = partial(pNc, code=INSTALL_CMD)
 template = partial(pNc, code=TEMPLATE)
+
+
+def msort(code=None, pp=True) -> None:
+    """import文をsortする関数"""
+    if code is None:
+        code = pyperclip.paste()
+    sorted_code = isort.code(code=code)
+    pNc(code=sorted_code, pp=pp)
+    return None
 
 
 def p():
