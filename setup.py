@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="quick-viz",
+    name="ezlite",
     version="0.2.6",
     author="t.ibi",
     author_email="t.ibi@estyle-inc.jp",
