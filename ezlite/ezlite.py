@@ -1,5 +1,6 @@
 import glob
 import os
+import sys
 from functools import partial
 from itertools import tee
 
@@ -24,7 +25,7 @@ def msort(code=None, pp=True) -> None:
 
 def p():
     """スクリプトの実行を中断する"""
-    raise Exception
+    sys.exit(1)
 
 
 def lsplit(text: str, *, multiline=True, pp=True) -> None:

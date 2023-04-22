@@ -92,9 +92,9 @@ def grouping_next(idx_li):
 def search_jp(code, ignore_num, ignore_kakko):
     # 日本語とアンダーバーの正規表現パターン
     ptn = r"[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f|_|-"
-    if ignore_num == False:
+    if ignore_num is False:
         ptn += r"|\d"
-    if ignore_kakko == False:
+    if ignore_kakko is False:
         ptn += r"|\(|\)"
     ptn += r"]"
     # 正規表現で検索（マッチオブジェクトが返ってくる）
