@@ -1,6 +1,5 @@
 import glob
 import os
-import sys
 from functools import partial
 from itertools import tee
 
@@ -13,26 +12,21 @@ upgrade = partial(pNc, code=INSTALL_CMD)
 template = partial(pNc, code=TEMPLATE)
 
 
-def pd_disable_writer() -> None:
-    # ファイル出力をスキップするデコレータ
-    def skip_file_output(func):
-        def wrapper(self, *args, **kwargs):
-            print("ファイル出力をスキップしました。")
+def switch_writer(switch: bool) -> None:
+    """DataFrameの出力するメソッドを無効化/有効化する
 
-        return wrapper
+    Args:
+        switch (bool): 条件分岐に使う変数
 
-    # DataFrameクラスにデコレータを適用する
-    DataFrame.to_csv = skip_file_output(DataFrame.to_csv)
-    DataFrame.to_excel = skip_file_output(DataFrame.to_excel)
-    print("Pandasのto_csvとto_xlsxのファイル出力を無効化しました。")
-    return None
-
-
-def pd_enable_writer() -> None:
-    # デコレータを削除して元の状態に戻す（バックアップから復元）
-    DataFrame.to_csv = pd_to_csv
-    DataFrame.to_excel = pd_to_excel
-    print("Pandasのto_csvとto_xlsxのファイル出力を有効化しました。")
+    Returns:
+        _type_: None
+    """
+    if switch:
+        pd_enable_writer()
+    else:
+        pd_disable_writer()
+    state = "ON" if switch else "OFF"
+    print(f"DataFrameのto_csvとto_xlsxのファイル出力: {state}")
     return None
 
 

@@ -30,6 +30,27 @@ pd_to_csv = DataFrame.to_csv
 pd_to_excel = DataFrame.to_excel
 
 
+def pd_disable_writer() -> None:
+    # ファイル出力をスキップするデコレータ
+    def skip_file_output(func):
+        def wrapper(self, *args, **kwargs):
+            print("ファイル出力をスキップしました。")
+
+        return wrapper
+
+    # DataFrameクラスにデコレータを適用する
+    DataFrame.to_csv = skip_file_output(DataFrame.to_csv)
+    DataFrame.to_excel = skip_file_output(DataFrame.to_excel)
+    return None
+
+
+def pd_enable_writer() -> None:
+    # デコレータを削除して元の状態に戻す（バックアップから復元）
+    DataFrame.to_csv = pd_to_csv
+    DataFrame.to_excel = pd_to_excel
+    return None
+
+
 def multi_replace(string, mapping):
     """
     文字列中の複数の文字列やパターンを同時に置換します。
