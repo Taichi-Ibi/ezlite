@@ -5,6 +5,8 @@ import platform
 import pyperclip
 import re
 
+from pandas import DataFrame
+
 INSTALL_CMD = "pip install git+https://github.com/Taichi-Ibi/ezlite --upgrade"
 
 
@@ -23,6 +25,10 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 """
 
+# DataFrameクラスにデコレータを適用する前の状態を保存する
+pd_to_csv = DataFrame.to_csv
+pd_to_excel = DataFrame.to_excel
+
 
 def multi_replace(string, mapping):
     """
@@ -39,9 +45,8 @@ def multi_replace(string, mapping):
     return re.subn(catch_all_pattern, replacer, string)[0]
 
 
-_PatternType = type(
-    re.compile("")
-)  # workaround for Python which does't have typing module
+# workaround for Python which does't have typing module
+_PatternType = type(re.compile(""))
 
 
 def to_pattern(key):

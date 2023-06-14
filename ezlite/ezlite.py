@@ -9,9 +9,31 @@ import pyperclip
 
 from .utils import *
 
-
 upgrade = partial(pNc, code=INSTALL_CMD)
 template = partial(pNc, code=TEMPLATE)
+
+
+def pd_disable_writer() -> None:
+    # ファイル出力をスキップするデコレータ
+    def skip_file_output(func):
+        def wrapper(self, *args, **kwargs):
+            print("ファイル出力をスキップしました。")
+
+        return wrapper
+
+    # DataFrameクラスにデコレータを適用する
+    DataFrame.to_csv = skip_file_output(DataFrame.to_csv)
+    DataFrame.to_excel = skip_file_output(DataFrame.to_excel)
+    print("Pandasのto_csvとto_xlsxのファイル出力を無効化しました。")
+    return None
+
+
+def pd_enable_writer() -> None:
+    # デコレータを削除して元の状態に戻す（バックアップから復元）
+    DataFrame.to_csv = pd_to_csv
+    DataFrame.to_excel = pd_to_excel
+    print("Pandasのto_csvとto_xlsxのファイル出力を有効化しました。")
+    return None
 
 
 def msort(code=None, pp=True) -> None:
@@ -21,11 +43,6 @@ def msort(code=None, pp=True) -> None:
     sorted_code = isort.code(code=code)
     pNc(code=sorted_code, pp=pp)
     return None
-
-
-def p():
-    """スクリプトの実行を中断する"""
-    sys.exit(1)
 
 
 def lsplit(text: str, *, multiline=True, pp=True) -> None:
