@@ -4,6 +4,7 @@ from functools import partial
 from itertools import tee
 
 import isort
+from pandas import DataFrame
 import pyperclip
 
 from .utils import *
@@ -12,21 +13,55 @@ upgrade = partial(pNc, code=INSTALL_CMD)
 template = partial(pNc, code=TEMPLATE)
 
 
-def switch_writer(switch: bool) -> None:
-    """DataFrameの出力するメソッドを無効化/有効化する
+# DataFrameクラスにデコレータを適用する前の状態を保存する
+pd_to_csv = DataFrame.to_csv
+pd_to_excel = DataFrame.to_excel
 
-    Args:
-        switch (bool): 条件分岐に使う変数
 
-    Returns:
-        _type_: None
-    """
-    if switch:
-        pd_enable_writer()
-    else:
-        pd_disable_writer()
-    state = "ON" if switch else "OFF"
-    print(f"DataFrameのto_csvとto_xlsxのファイル出力: {state}")
+# def pd_disable_writer() -> None:
+#     # ファイル出力をスキップするデコレータ
+#     def skip_file_output(func):
+#         def wrapper(self, *args, **kwargs):
+#             print("ファイル出力をスキップしました。")
+
+#         return wrapper
+
+#     # DataFrameクラスにデコレータを適用する
+#     DataFrame.to_csv = skip_file_output(DataFrame.to_csv)
+#     DataFrame.to_excel = skip_file_output(DataFrame.to_excel)
+#     return None
+
+
+def reset_writer_option() -> None:
+    # デコレータを削除して元の状態に戻す（バックアップから復元）
+    DataFrame.to_csv = pd_to_csv
+    DataFrame.to_excel = pd_to_excel
+    return None
+
+
+def set_writer_option(dirname=None):
+    reset_writer_option()
+    if dirname is not None:
+        # デスクトップのパスを取得
+        homepath = os.getenv(home_environ())
+        export_dir = os.path.join(homepath, "Desktop", dirname)
+        # 出力ディレクトリを作成
+        if not os.path.exists(export_dir):
+            os.mkdir(export_dir)
+
+        def modify_path_or_buf(func):
+            def wrapper(self, path_or_buf, *args, **kwargs):
+                # ファイル名
+                filename = os.path.basename(path_or_buf)
+                # 書き換えたいパスやバッファーを指定
+                modified_path_or_buf = os.path.join(export_dir, filename)
+                return func(self, modified_path_or_buf, *args, **kwargs)
+
+            return wrapper
+
+        DataFrame.to_csv = modify_path_or_buf(DataFrame.to_csv)
+        DataFrame.to_excel = modify_path_or_buf(DataFrame.to_excel)
+        print(f"出力ディレクトリ: {export_dir}")
     return None
 
 

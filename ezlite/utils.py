@@ -5,8 +5,6 @@ import platform
 import pyperclip
 import re
 
-from pandas import DataFrame
-
 INSTALL_CMD = "pip install git+https://github.com/Taichi-Ibi/ezlite --upgrade"
 
 
@@ -24,31 +22,6 @@ import japanize_matplotlib
 import matplotlib.pyplot as plt
 import seaborn as sns
 """
-
-# DataFrameクラスにデコレータを適用する前の状態を保存する
-pd_to_csv = DataFrame.to_csv
-pd_to_excel = DataFrame.to_excel
-
-
-def pd_disable_writer() -> None:
-    # ファイル出力をスキップするデコレータ
-    def skip_file_output(func):
-        def wrapper(self, *args, **kwargs):
-            print("ファイル出力をスキップしました。")
-
-        return wrapper
-
-    # DataFrameクラスにデコレータを適用する
-    DataFrame.to_csv = skip_file_output(DataFrame.to_csv)
-    DataFrame.to_excel = skip_file_output(DataFrame.to_excel)
-    return None
-
-
-def pd_enable_writer() -> None:
-    # デコレータを削除して元の状態に戻す（バックアップから復元）
-    DataFrame.to_csv = pd_to_csv
-    DataFrame.to_excel = pd_to_excel
-    return None
 
 
 def multi_replace(string, mapping):
@@ -269,15 +242,20 @@ def fix_sep(path):
     return sep
 
 
+def home_environ():
+    if platform.system() == "Windows":
+        # Windowsの場合
+        environ = "HOMEPATH"
+    else:
+        # MacやLinuxの場合
+        environ = "HOME"
+    return environ
+
+
 def get_upper_dir(environ):
     if environ is None:
         # 引数なしの場合
-        if platform.system() == "Windows":
-            # Windowsの場合
-            environ = "HOMEPATH"
-        else:
-            # MacやLinuxの場合
-            environ = "HOME"
+        environ = home_environ()
     else:
         # 引数ありの場合はそのまま使う
         pass
