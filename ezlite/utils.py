@@ -5,6 +5,8 @@ import platform
 import pyperclip
 import re
 
+from pandas import DataFrame
+
 INSTALL_CMD = "pip install git+https://github.com/Taichi-Ibi/ezlite --upgrade"
 
 
@@ -22,6 +24,36 @@ import japanize_matplotlib
 import matplotlib.pyplot as plt
 import seaborn as sns
 """
+
+# DataFrameクラスにデコレータを適用する前の状態を保存する
+pd_to_csv = DataFrame.to_csv
+pd_to_excel = DataFrame.to_excel
+
+
+def pd_reset_write_option() -> None:
+    # デコレータを削除して元の状態に戻す（バックアップから復元）
+    DataFrame.to_csv = pd_to_csv
+    DataFrame.to_excel = pd_to_excel
+    return None
+
+
+def modify_path(path, dirname=None, prefix="", suffix=""):
+    # ファイル名を拡張子つきで取得
+    _basename = os.path.basename(path)
+    # Desktopに出力するようパスを置換
+    if dirname is not None:
+        homepath = os.getenv(home_environ())
+        dirname = os.path.join(homepath, "Desktop", dirname)
+        path = os.path.join(dirname, _basename)
+        os.makedirs(dirname, exist_ok=True)
+    if any([prefix, suffix]):
+        # ファイル名を取得
+        _filename, ext = _basename.split(".")
+        # 新しいファイル名を作成
+        basename = (".").join([prefix + _filename + suffix, ext])
+        # ファイル名を書き換え
+        path = path.replace(_basename, basename)
+    return path
 
 
 def multi_replace(string, mapping):
