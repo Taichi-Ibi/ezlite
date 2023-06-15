@@ -121,6 +121,8 @@ def psplit(path="", *, multiline=True, pp=True) -> None:
     if path == "":
         # 引数がない場合はクリップボードからコピー
         path = pyperclip.paste()
+    # 引用符を削除
+    path = path.strip("'").strip('"')
     # 絶対パスに変換
     path = ref2abs(path)
     # 同じ文字を含む環境変数を抽出
