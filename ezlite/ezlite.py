@@ -2,6 +2,9 @@ import glob
 import os
 from functools import partial
 from itertools import tee
+import subprocess
+import time
+from typing import List
 
 import isort
 from pandas import DataFrame
@@ -11,6 +14,32 @@ from .utils import *
 
 upgrade = partial(pNc, code=INSTALL_CMD)
 template = partial(pNc, code=TEMPLATE)
+
+
+def df_viewer(
+    df: DataFrame,
+    *,
+    head: int = 100,
+    tail: int = None,
+    columns: List[str] = None,
+):
+    # dfをhtmlに出力
+    if columns is not None:
+        df = df[columns].copy()
+    df = df.head(head).copy()
+    if tail is not None:
+        df = df.tail(tail).copy()
+    html_path = "df_viewer.html"
+    df.to_html(html_path)
+
+    # htmlをopen
+    if platform.system() == "Windows":
+        os.startfile(html_path)
+    else:
+        subprocess.call(["open", html_path])
+    time.sleep(1)
+    os.remove(html_path)
+    return None
 
 
 def pd_write_option(dirname=None, *, prefix="", suffix="", skip=False):

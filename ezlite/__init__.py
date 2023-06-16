@@ -1,4 +1,5 @@
 from .ezlite import (
+    df_viewer,
     j,
     lsplit,
     msort,
