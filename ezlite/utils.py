@@ -30,7 +30,7 @@ pd_to_csv = DataFrame.to_csv
 pd_to_excel = DataFrame.to_excel
 
 
-def pd_reset_write_option() -> None:
+def df_reset_write_option() -> None:
     # デコレータを削除して元の状態に戻す（バックアップから復元）
     DataFrame.to_csv = pd_to_csv
     DataFrame.to_excel = pd_to_excel

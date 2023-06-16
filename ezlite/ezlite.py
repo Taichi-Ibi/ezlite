@@ -3,7 +3,6 @@ import os
 from functools import partial
 from itertools import tee
 import subprocess
-import time
 from typing import List
 
 import isort
@@ -37,13 +36,12 @@ def df_viewer(
         os.startfile(html_path)
     else:
         subprocess.call(["open", html_path])
-    time.sleep(1)
     os.remove(html_path)
     return None
 
 
-def pd_write_option(dirname=None, *, prefix="", suffix="", skip=False):
-    pd_reset_write_option()
+def df_write_option(dirname=None, *, prefix="", suffix="", skip=False):
+    df_reset_write_option()
 
     def modify_path_or_buf(func):
         def wrapper(self, path_or_buf, *args, **kwargs):
