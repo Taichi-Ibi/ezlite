@@ -3,6 +3,7 @@ import os
 from functools import partial
 from itertools import tee
 import subprocess
+import time
 from typing import List
 
 import isort
@@ -36,6 +37,7 @@ def df_viewer(
         os.startfile(html_path)
     else:
         subprocess.call(["open", html_path])
+    time.sleep(5)
     os.remove(html_path)
     return None
 
