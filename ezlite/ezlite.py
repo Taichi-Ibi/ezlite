@@ -15,6 +15,25 @@ from .utils import *
 upgrade = partial(pNc, code=INSTALL_CMD)
 template = partial(pNc, code=TEMPLATE)
 
+def history(_locals, word=None, n=20, desc=True) -> str:
+    """Jupyterで過去に実行したコードを出力する(カーネル再起動によりログは失われる)"""
+    _locals.popitem()
+    i_codes = [v for k, v in _locals.items() if re.findall(r'_i[0-9]+', k)]
+    if desc:
+        i_codes.reverse()
+    if word is not None:
+        i_codes = [c for c in i_codes[:n] if word in c]
+    if not i_codes:
+        return
+    o_codes = list()
+    for code in i_codes:
+        if bool(o_codes) & (code in o_codes):
+            pass
+        else:
+            o_codes.append(code)
+    o_codes = [">>>\n" + c for c in o_codes]
+    code = ("\n\n").join(o_codes)
+    print(code)
 
 def df_viewer(
     df: DataFrame,
